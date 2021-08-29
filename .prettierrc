@@ -1,0 +1,5 @@
+{
+  "singleQuote": true,
+  "disableLanguages": ["js"],
+  "trailingComma": "es5"
+}
