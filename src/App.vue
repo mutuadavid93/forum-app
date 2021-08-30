@@ -1,5 +1,4 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
   <div class="container">
     <!--
     router-view will always render the correct component configured at
