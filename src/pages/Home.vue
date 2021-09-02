@@ -1,70 +1,23 @@
 <template>
-  <div class="col-large push-top" v-if="thread">
-    <h1>{{ thread.title }}</h1>
-
-    <div class="post-list">
-      <div class="post" v-for="postId in thread.posts" :key="postId">
-        <div class="user-info">
-          <a href="#" class="user-name">{{ userById(postById(postId).userId).name }}</a>
-          <a href="#">
-            <img class="avatar-large" :src="userById(postById(postId).userId).avatar" alt="" />
-          </a>
-          <p class="desktop-only text-small">107 posts</p>
-        </div>
-
-        <div class="post-content">
-          <div>
-            <p>
-              {{ postById(postId).text }}
-            </p>
-          </div>
-        </div>
-
-        <div class="post-date text-faded">
-          {{ postById(postId).publishedAt }}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div v-else class="col-full text-centre">
-    <h1>This thread doesn't exist</h1>
-    <router-link :to="{ name: 'Home' }">Read some cool threads instead</router-link>
+  <div>
+    <h1>Welcome to the forum</h1>
+    <category-list :categories="categories"/>
   </div>
 </template>
 
 <script>
 import sourceData from '@/seed.json';
+import CategoryList from '@/components/CategoryList.vue';
 
 export default {
-  // make sure to add a prop named exactly like the route param e.g. `id`
-  props: {
-    id: {
-      required: true,
-      type: String,
-    },
+  name: 'Home',
+  components: {
+    CategoryList,
   },
   data() {
     return {
-      threads: sourceData.threads,
-      posts: sourceData.posts,
-      users: sourceData.users,
+      categories: sourceData.categories,
     };
-  },
-
-  computed: {
-    thread() {
-      // this.id is also available under `this.$route.params.id`
-      return this.threads.find((thread) => thread.id === this.id);
-    },
-  },
-
-  methods: {
-    postById(postId) {
-      return this.posts.find((post) => postId === post.id);
-    },
-    userById(userId) {
-      return this.users.find((user) => userId === user.id);
-    },
   },
 };
 </script>

@@ -12,7 +12,7 @@
           </p>
           <p class="text-faded text-xsmall">
             By <a href="#">{{ userById(thread.userId).name }}</a
-            >, {{ thread.publishedAt }}.
+            >, <app-date :timestamp="thread.publishedAt"></app-date>.
           </p>
         </div>
 
@@ -25,7 +25,9 @@
             <p class="text-xsmall">
               <a href="#">{{ userById(thread.userId).name }}</a>
             </p>
-            <p class="text-xsmall text-faded">{{ thread.publishedAt }}</p>
+            <p class="text-xsmall text-faded">
+              <app-date :timestamp="thread.publishedAt"></app-date>
+            </p>
           </div>
         </div>
       </div>
@@ -37,6 +39,7 @@
 import sourceData from '@/seed.json';
 
 export default {
+  name: 'ThreadList',
   props: {
     threads: {
       type: Array,

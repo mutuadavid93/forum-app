@@ -1,16 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import PageHome from '@/components/PageHome.vue';
-import PageThreadShow from '@/components/PageThreadShow.vue';
-import PageNotFound from '@/components/PageNotFound.vue';
+import Home from '@/pages/Home.vue';
+import ThreadShow from '@/pages/ThreadShow.vue';
+import NotFound from '@/pages/NotFound.vue';
+import Forum from '@/pages/Forum.vue';
+import Category from '../pages/Category.vue';
 import sourceData from '@/seed.json';
 
 // Define your routes
 const routes = [
-  { path: '/', name: 'Home', component: PageHome },
+  { path: '/', name: 'Home', component: Home },
+  {
+    path: '/forum/:id',
+    name: 'Forum',
+    component: Forum,
+    props: true,
+  },
+  {
+    path: '/category/:id',
+    name: 'Category',
+    component: Category,
+    props: true,
+  },
   {
     path: '/thread/:id',
     name: 'ThreadShow',
-    component: PageThreadShow,
+    component: ThreadShow,
     // Allow props in named routes
     props: true,
 
@@ -33,7 +47,7 @@ const routes = [
     },
   },
   // will match everything and put it under `$route.params.pathMatch`
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: PageNotFound },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
 ];
 
 export default createRouter({

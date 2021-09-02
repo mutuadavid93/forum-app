@@ -1,22 +1,56 @@
 <template>
-  <div>
-    <h1>Welcome to the forum</h1>
-    <thread-list :threads="threads"></thread-list>
+  <div class="col-large push-top" v-if="thread">
+    <h1>{{ thread.title }}</h1>
+    <post-list :posts="threadPosts"></post-list>
   </div>
+  <div v-else class="col-full text-centre">
+    <h1>This thread doesn't exist</h1>
+    <router-link :to="{ name: 'Home' }">Read some cool threads instead</router-link>
+  </div>
+  <post-editor @save-post="addPost"></post-editor>
 </template>
 
 <script>
 import sourceData from '@/seed.json';
-import ThreadList from './ThreadList.vue';
+import PostList from '@/components/PostList.vue';
+import PostEditor from '@/components/PostEditor.vue';
 
 export default {
-  components: {
-    ThreadList,
+  // component name is good for debugging purposes on VueJS Devtools
+  name: 'ThreadShow',
+  components: { PostList, PostEditor },
+  // make sure to add a prop named exactly like the route param e.g. `id`
+  props: {
+    id: {
+      required: true,
+      type: String,
+    },
   },
   data() {
     return {
       threads: sourceData.threads,
+      posts: sourceData.posts,
     };
+  },
+
+  computed: {
+    thread() {
+      // this.id is also available under `this.$route.params.id`
+      return this.threads.find((thread) => thread.id === this.id);
+    },
+    threadPosts() {
+      return this.posts.filter((post) => post.threadId === this.id);
+    },
+  },
+
+  methods: {
+    addPost(eventData) {
+      const post = {
+        ...eventData.post, threadId: this.id,
+      };
+      this.posts.push(post);
+      this.thread.posts.push(post.id);
+    },
   },
 };
 </script>
