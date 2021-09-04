@@ -9,7 +9,6 @@
 </template>
 
 <script>
-import sourceData from '@/seed.json';
 import ForumList from '@/components/ForumList.vue';
 
 export default {
@@ -25,7 +24,7 @@ export default {
   },
   methods: {
     getCategoryForums(category) {
-      return sourceData.forums.filter((forum) => forum.categoryId === category.id);
+      return this.$store.state.forums.filter((forum) => forum.categoryId === category.id);
     },
   },
 };

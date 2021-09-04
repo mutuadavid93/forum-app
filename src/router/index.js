@@ -4,8 +4,8 @@ import ThreadShow from '@/pages/ThreadShow.vue';
 import NotFound from '@/pages/NotFound.vue';
 import Forum from '@/pages/Forum.vue';
 import Category from '../pages/Category.vue';
-import sourceData from '@/seed.json';
-
+import Profile from '@/pages/Profile.vue';
+import { threads } from '@/seed.json';
 // Define your routes
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -14,6 +14,21 @@ const routes = [
     name: 'Forum',
     component: Forum,
     props: true,
+  },
+
+  // Two routes can use same Component but different names
+  {
+    path: '/me',
+    name: 'Profile',
+    component: Profile,
+    meta: { toTop: true, smoothScroll: true },
+  },
+  {
+    path: '/me/edit',
+    name: 'ProfileEdit',
+    component: Profile,
+    // Update your props here too e.g. a negation
+    props: { edit: true },
   },
   {
     path: '/category/:id',
@@ -31,7 +46,7 @@ const routes = [
     // Route Guard; Handle wrong thread paths
     beforeEnter(to, from, next) {
       // check if thread exists
-      const threadExists = sourceData.threads.find((thread) => thread.id === to.params.id);
+      const threadExists = threads.find((thread) => thread.id === to.params.id);
       // if it exists, continue
       if (threadExists) {
         return next();
@@ -55,4 +70,12 @@ export default createRouter({
   // your URLs look natural
   history: createWebHistory(),
   routes,
+
+  // Restrict scroll beahavior only to routes that have specified
+  scrollBehavior(to) {
+    const scroll = {};
+    if (to.meta.toTop) scroll.top = 0;
+    if (to.meta.smoothScroll) scroll.behavior = 'smooth';
+    return scroll;
+  },
 });

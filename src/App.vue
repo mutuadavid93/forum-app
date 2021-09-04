@@ -1,4 +1,5 @@
 <template>
+<the-navbar/>
   <div class="container">
     <!--
     router-view will always render the correct component configured at
@@ -10,8 +11,11 @@
 </template>
 
 <script>
+import TheNavbar from './components/TheNavbar.vue';
+
 export default {
   name: 'App',
+  components: { TheNavbar },
 };
 </script>
 

@@ -36,8 +36,6 @@
 </template>
 
 <script>
-import sourceData from '@/seed.json';
-
 export default {
   name: 'ThreadList',
   props: {
@@ -46,19 +44,20 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      posts: sourceData.posts,
-      users: sourceData.users,
-    };
-  },
-
   methods: {
     postById(postId) {
       return this.posts.find((post) => postId === post.id);
     },
     userById(userId) {
       return this.users.find((user) => userId === user.id);
+    },
+  },
+  computed: {
+    posts() {
+      return this.$store.state.posts;
+    },
+    users() {
+      return this.$store.state.users;
     },
   },
 };

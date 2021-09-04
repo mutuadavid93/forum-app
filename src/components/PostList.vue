@@ -25,22 +25,19 @@
 </template>
 
 <script>
-import sourceData from '@/seed.json';
 
 export default {
   name: 'PostList',
   props: {
     posts: { type: Array, required: true },
   },
-  data() {
-    return {
-      users: sourceData.users,
-    };
-  },
   methods: {
     userById(userId) {
       return this.users.find((user) => userId === user.id);
     },
+  },
+  computed: {
+    users() { return this.$store.state.users; },
   },
 };
 </script>

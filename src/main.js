@@ -1,9 +1,11 @@
 import { createApp } from 'vue';
 import App from '@/App.vue';
+import store from '@/store';
 import router from '@/router';
 
 const forumApp = createApp(App);
 forumApp.use(router);
+forumApp.use(store);
 
 // Implicitly import and register Global components
 const requireComponent = require.context('@/components', true, /App[A-Z]\w+\.(vue|js)$/);
