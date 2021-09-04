@@ -1,6 +1,15 @@
 <template>
   <div class="col-large push-top" v-if="thread">
-    <h1>{{ thread.title }}</h1>
+    <h1>
+      {{ thread.title }}
+      <router-link
+        :to="{ name: 'ThreadEdit', params: { id: this.id } }"
+        tag="button"
+        class="btn-green btn-small"
+      >
+        Edit Thread
+      </router-link>
+    </h1>
     <post-list :posts="threadPosts"></post-list>
   </div>
   <div v-else class="col-full text-centre">
@@ -11,6 +20,7 @@
 </template>
 
 <script>
+import { findById } from '@/helpers';
 import PostList from '@/components/PostList.vue';
 import PostEditor from '@/components/PostEditor.vue';
 
@@ -27,11 +37,15 @@ export default {
   },
 
   computed: {
-    threads() { return this.$store.state.threads; },
-    posts() { return this.$store.state.posts; },
+    threads() {
+      return this.$store.state.threads;
+    },
+    posts() {
+      return this.$store.state.posts;
+    },
     thread() {
       // this.id is also available under `this.$route.params.id`
-      return this.threads.find((thread) => thread.id === this.id);
+      return findById(this.threads, this.id);
     },
     threadPosts() {
       return this.posts.filter((post) => post.threadId === this.id);
@@ -41,7 +55,8 @@ export default {
   methods: {
     save(eventData) {
       const post = {
-        ...eventData.post, threadId: this.id,
+        ...eventData.post,
+        threadId: this.id,
       };
       this.$store.dispatch('createPost', post);
     },
