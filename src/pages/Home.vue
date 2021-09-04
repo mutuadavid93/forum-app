@@ -1,12 +1,11 @@
 <template>
   <div>
-    <h1>Welcome to the forum</h1>
+    <h1 class="push-top">Welcome to the forum</h1>
     <category-list :categories="categories"/>
   </div>
 </template>
 
 <script>
-import sourceData from '@/seed.json';
 import CategoryList from '@/components/CategoryList.vue';
 
 export default {
@@ -14,10 +13,10 @@ export default {
   components: {
     CategoryList,
   },
-  data() {
-    return {
-      categories: sourceData.categories,
-    };
+  computed: {
+    categories() {
+      return this.$store.state.categories;
+    },
   },
 };
 </script>

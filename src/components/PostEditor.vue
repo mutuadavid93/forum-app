@@ -19,12 +19,8 @@ export default {
   },
   methods: {
     addPost() {
-      const postId = `Hangul_${Math.random()}`;
       const post = {
-        id: postId,
         text: this.newPostText,
-        publishedAt: Math.floor(Date.now() / 1000),
-        userId: 'ALXhxjwgY9PinwNGHpfai6OWyDu2',
       };
       this.$emit('save-post', { post }); // access under eventData.post
       this.newPostText = '';

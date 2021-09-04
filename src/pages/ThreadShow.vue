@@ -7,11 +7,10 @@
     <h1>This thread doesn't exist</h1>
     <router-link :to="{ name: 'Home' }">Read some cool threads instead</router-link>
   </div>
-  <post-editor @save-post="addPost"></post-editor>
+  <post-editor @save-post="save"></post-editor>
 </template>
 
 <script>
-import sourceData from '@/seed.json';
 import PostList from '@/components/PostList.vue';
 import PostEditor from '@/components/PostEditor.vue';
 
@@ -26,14 +25,10 @@ export default {
       type: String,
     },
   },
-  data() {
-    return {
-      threads: sourceData.threads,
-      posts: sourceData.posts,
-    };
-  },
 
   computed: {
+    threads() { return this.$store.state.threads; },
+    posts() { return this.$store.state.posts; },
     thread() {
       // this.id is also available under `this.$route.params.id`
       return this.threads.find((thread) => thread.id === this.id);
@@ -44,12 +39,11 @@ export default {
   },
 
   methods: {
-    addPost(eventData) {
+    save(eventData) {
       const post = {
         ...eventData.post, threadId: this.id,
       };
-      this.posts.push(post);
-      this.thread.posts.push(post.id);
+      this.$store.dispatch('createPost', post);
     },
   },
 };
