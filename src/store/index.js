@@ -3,8 +3,11 @@ import sourceData from '@/seed.json';
 import { findById, upsert } from '@/helpers';
 
 const getters = {
-  authUser: (state) => {
-    const currentUser = findById(state.users, state.authId);
+  // eslint-disable-next-line no-shadow
+  authUser: (state, getters) => getters.user(state.authId),
+  // To pass arguments into getters, use Higher Order Functions
+  user: (state) => (id) => {
+    const currentUser = findById(state.users, id);
     if (!currentUser) {
       return null;
     }
@@ -26,6 +29,33 @@ const getters = {
       },
     };
   },
+  thread: (state) => (id) => {
+    const thread = findById(state.threads, id);
+    return {
+      ...thread,
+      get author() {
+        return findById(state.users, thread.userId);
+      },
+      get repliesCount() {
+        return thread.posts.length - 1;
+      },
+      get contributorsCount() {
+        return thread.contributors?.length || 0;
+      },
+    };
+  },
+};
+
+// Higher order functions to create mutations
+const makeAppendChildToParentMutation = ({ parent, child }) => (state, { childId, parentId }) => {
+  const resource = findById(state[parent], parentId);
+  // make sure a posts property exists in a resource
+  resource[child] = resource[child] || [];
+
+  // Only push if it's a unique id
+  if (!resource[child].includes(childId)) {
+    resource[child].push(childId);
+  }
 };
 
 const mutations = {
@@ -33,29 +63,20 @@ const mutations = {
     upsert(state.posts, post);
   },
   setUser(state, { user, userId }) {
-    const userIndex = state.users.findIndex((userx) => userx.id === userId);
+    const userIndex = state.users.findIndex((u) => u.id === userId);
     state.users[userIndex] = user;
   },
-  appendPostToThread(state, { postId, threadId }) {
-    const thread = findById(state.threads, threadId);
-    // make sure a posts property exists in a thread
-    thread.posts = thread.posts || [];
-    thread.posts.push(postId);
-  },
-
   setThread(state, { thread }) {
     upsert(state.threads, thread);
   },
-  appendThreadToForum(state, { forumId, threadId }) {
-    const forum = findById(state.forums, forumId);
-    forum.threads = forum.threads || [];
-    forum.threads.push(threadId);
-  },
-  appendThreadToUser(state, { userId, threadId }) {
-    const user = findById(state.users, userId);
-    user.threads = user.threads || [];
-    user.threads.push(threadId);
-  },
+  // Closures are Higher order functions in a nutshell :)
+  appendPostToThread: makeAppendChildToParentMutation({ parent: 'threads', child: 'posts' }),
+  appendThreadToForum: makeAppendChildToParentMutation({ parent: 'forums', child: 'threads' }),
+  appendThreadToUser: makeAppendChildToParentMutation({ parent: 'users', child: 'threads' }),
+  appendContributorToThread: makeAppendChildToParentMutation({
+    parent: 'threads',
+    child: 'contributors',
+  }),
 };
 
 const actions = {
@@ -66,7 +87,8 @@ const actions = {
       userId: state.authId,
     });
     commit('setPost', { post });
-    commit('appendPostToThread', { postId: post.id, threadId: post.threadId });
+    commit('appendPostToThread', { childId: post.id, parentId: post.threadId });
+    commit('appendContributorToThread', { childId: state.authId, parentId: post.threadId });
   },
 
   updateUser({ commit }, user) {
@@ -84,7 +106,8 @@ const actions = {
       forumId, title, publishedAt, userId, id,
     };
     commit('setThread', { thread });
-    commit('appendThreadToUser', { userId, threadId: id });
+    commit('appendThreadToUser', { parentId: userId, childId: id });
+    commit('appendThreadToForum', { parentId: forumId, childId: id });
     dispatch('createPost', { text, threadId: id });
 
     return findById(state.threads, id);
@@ -105,7 +128,7 @@ const actions = {
 
 export default createStore({
   state: { ...sourceData, authId: 'ALXhxjwgY9PinwNGHpfai6OWyDu2' },
-  actions,
-  mutations,
   getters,
+  mutations,
+  actions,
 });
