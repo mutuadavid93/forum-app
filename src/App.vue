@@ -11,15 +11,23 @@
 </template>
 
 <script>
-import TheNavbar from './components/TheNavbar.vue';
+import { mapActions } from 'vuex';
+import TheNavbar from '@/components/TheNavbar.vue';
 
 export default {
   name: 'App',
   components: { TheNavbar },
+  methods: {
+    ...mapActions(['fetchAuthUser']),
+  },
+  // Fetch the authenticated user from state
+  created() {
+    this.fetchAuthUser();
+  },
 };
 </script>
 
 <style>
 /* Global Styles Live Here, so they can be minified when in production */
-@import 'assets/style.css';
+@import "assets/style.css";
 </style>

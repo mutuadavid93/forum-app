@@ -11,9 +11,8 @@
       </router-link>
     </h1>
     <p>
-      By <a href="#" class="link-unstyled">{{ thread.author.name }}</a
-      >,
-      <AppDate :timestamp="thread.publishedAt" />.
+      By <a href="#" class="link-unstyled">{{ thread.author?.name }}</a
+      >, <AppDate :timestamp="thread.publishedAt" />.
       <span style="float:right; margin-top: 2px;" class="hide-mobile text-faded text-small"
         >{{ thread.repliesCount }} replies by {{ thread.contributorsCount }} contributors</span
       >
@@ -24,10 +23,11 @@
     <h1>This thread doesn't exist</h1>
     <router-link :to="{ name: 'Home' }">Read some cool threads instead</router-link>
   </div>
-  <post-editor @save-post="save"></post-editor>
+  <post-editor @save="save"></post-editor>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import PostList from '@/components/PostList.vue';
 import PostEditor from '@/components/PostEditor.vue';
 
@@ -61,13 +61,31 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'createPost',
+      'fetchThread',
+      'fetchUser',
+      'fetchPosts',
+      'fetchUsers',
+      'createPost',
+    ]),
     save(eventData) {
       const post = {
         ...eventData.post,
         threadId: this.id,
       };
-      this.$store.dispatch('createPost', post);
+      this.createPost(post);
     },
+  },
+
+  async created() {
+    // fetch the thread
+    const thread = await this.fetchThread({ id: this.id });
+    // fetch posts
+    const posts = await this.fetchPosts({ ids: thread.posts });
+    // fetch the users associated with the posts
+    const users = posts.map((post) => post.userId).concat(thread.userId);
+    this.fetchUsers({ ids: users });
   },
 };
 </script>

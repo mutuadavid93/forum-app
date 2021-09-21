@@ -51,7 +51,8 @@ export default {
       return findById(this.posts, postId);
     },
     userById(userId) {
-      return findById(this.users, userId);
+      // Return an empty object if the user isn't found
+      return findById(this.users, userId) || {};
     },
   },
   computed: {
@@ -61,6 +62,9 @@ export default {
     users() {
       return this.$store.state.users;
     },
+  },
+  mounted() {
+    console.log('-------- ', this.threads);
   },
 };
 </script>

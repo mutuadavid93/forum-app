@@ -7,8 +7,7 @@ import NotFound from '@/pages/NotFound.vue';
 import Forum from '@/pages/Forum.vue';
 import Category from '../pages/Category.vue';
 import Profile from '@/pages/Profile.vue';
-import { threads } from '@/seed.json';
-import { findById } from '@/helpers';
+import store from '@/store';
 // Define your routes
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -59,28 +58,29 @@ const routes = [
     props: true,
 
     // Route Guard; Handle wrong thread paths
-    beforeEnter(to, from, next) {
-      // check if thread exists
-      const threadExists = findById(threads, to.params.id);
-      // if it exists, continue
-      if (threadExists) {
-        return next();
-      }
-      return next({
-        name: 'NotFound',
-        // Give the user a chance to edit their wrong url
-        params: { pathMatch: to.path.substring(1).split('/') },
-        // Preserve existing query and hash
-        query: to.query,
-        hash: to.hash,
-      });
-    },
+    // async beforeEnter(to, from, next) {
+    //   await store.dispatch('fetchThread', { id: to.params.id, once: true });
+    //   // check if thread exists
+    //   const threadExists = findById(store.state.threads.items, to.params.id);
+    //   // if it exists, continue
+    //   if (threadExists) {
+    //     return next();
+    //   }
+    //   return next({
+    //     name: 'NotFound',
+    //     // Give the user a chance to edit their wrong url
+    //     params: { pathMatch: to.path.substring(1).split('/') },
+    //     // Preserve existing query and hash
+    //     query: to.query,
+    //     hash: to.hash,
+    //   });
+    // },
   },
   // will match everything and put it under `$route.params.pathMatch`
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
 ];
 
-export default createRouter({
+const router = createRouter({
   // Don't use the createWebHashHistory() instead use createWebHistory() thus
   // your URLs look natural
   history: createWebHistory(),
@@ -94,3 +94,10 @@ export default createRouter({
     return scroll;
   },
 });
+
+// Unsubscribe from onSnapshot events
+router.beforeEach(() => {
+  store.dispatch('unsubscribeAllSnapshots');
+});
+
+export default router;

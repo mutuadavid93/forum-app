@@ -1,7 +1,17 @@
 import { createApp } from 'vue';
+import firebase from 'firebase';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import App from '@/App.vue';
 import store from '@/store';
 import router from '@/router';
+import { firebaseConfig } from '@/config/firebase';
+
+library.add(faPencilAlt);
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 const forumApp = createApp(App);
 forumApp.use(router);
@@ -16,5 +26,6 @@ requireComponent.keys().forEach((fileName) => {
   const baseComponentName = baseComponentConfig.name || fileName.replace(/^.+\//, '').replace(/\.\w+$/, '');
   forumApp.component(baseComponentName, baseComponentConfig);
 });
+forumApp.component('fa', FontAwesomeIcon);
 
 forumApp.mount('#app');
