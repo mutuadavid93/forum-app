@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-if="asyncDataStatus_ready" class="container col-full">
     <div class="col-full push-top" v-if="forum">
       <div class="forum-header">
         <div class="forum-details">
@@ -23,6 +23,7 @@
 <script>
 import { mapActions } from 'vuex';
 import { findById } from '@/helpers';
+import asynDataStatus from '@/mixins/asyncDataStatus';
 import ThreadList from '@/components/ThreadList.vue';
 
 export default {
@@ -32,6 +33,7 @@ export default {
       required: true,
     },
   },
+  mixins: [asynDataStatus],
   components: { ThreadList },
   computed: {
     forum() {
@@ -52,7 +54,8 @@ export default {
     // Otherwise beforeCreate() hook would've been used
     const forum = await this.fetchForum({ id: this.id });
     const threads = await this.fetchThreads({ ids: forum.threads });
-    this.fetchUsers({ ids: threads.map((thread) => thread.userId) });
+    await this.fetchUsers({ ids: threads.map((thread) => thread.userId) });
+    this.asyncDataStatus_fetched();
   },
 };
 </script>

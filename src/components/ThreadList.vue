@@ -63,9 +63,6 @@ export default {
       return this.$store.state.users;
     },
   },
-  mounted() {
-    console.log('-------- ', this.threads);
-  },
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="col-large push-top" v-if="thread">
+  <div v-if="asyncDataStatus_ready" class="col-large push-top">
     <h1>
       {{ thread.title }}
       <router-link
@@ -18,18 +18,15 @@
       >
     </p>
     <post-list :posts="threadPosts"></post-list>
+    <post-editor @save="save"></post-editor>
   </div>
-  <div v-else class="col-full text-centre">
-    <h1>This thread doesn't exist</h1>
-    <router-link :to="{ name: 'Home' }">Read some cool threads instead</router-link>
-  </div>
-  <post-editor @save="save"></post-editor>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
 import PostList from '@/components/PostList.vue';
 import PostEditor from '@/components/PostEditor.vue';
+import asynDataStatus from '@/mixins/asyncDataStatus';
 
 export default {
   // component name is good for debugging purposes on VueJS Devtools
@@ -42,6 +39,7 @@ export default {
       type: String,
     },
   },
+  mixins: [asynDataStatus],
 
   computed: {
     threads() {
@@ -85,7 +83,8 @@ export default {
     const posts = await this.fetchPosts({ ids: thread.posts });
     // fetch the users associated with the posts
     const users = posts.map((post) => post.userId).concat(thread.userId);
-    this.fetchUsers({ ids: users });
+    await this.fetchUsers({ ids: users });
+    this.asyncDataStatus_fetched();
   },
 };
 </script>
