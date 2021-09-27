@@ -1,6 +1,6 @@
 <template>
-  <span :title="humanFriendly()">
-    {{ sanitizeDate() }}
+  <span :title="humanFriendly">
+    {{ sanitizeDate }}
   </span>
 </template>
 
@@ -15,17 +15,19 @@ dayjs.extend(localizedTime);
 export default {
   props: {
     timestamp: {
-      type: Number,
+      type: [Number, Object],
       required: true,
     },
-
   },
-  methods: {
+  computed: {
+    normalizedTimestamp() {
+      return this.timestamp?.seconds ?? this.timestamp;
+    },
     sanitizeDate() {
-      return dayjs.unix(this.timestamp).fromNow();
+      return dayjs.unix(this.normalizedTimestamp).fromNow();
     },
     humanFriendly() {
-      return dayjs.unix(this.timestamp).format('llll');
+      return dayjs.unix(this.normalizedTimestamp).format('llll');
     },
   },
 };

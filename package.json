@@ -8,8 +8,12 @@
     "lint": "vue-cli-service lint --fix"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-4",
     "core-js": "^3.6.5",
     "dayjs": "^1.10.6",
+    "firebase": "^8.10.0",
     "vue": "^3.0.0",
     "vue-router": "4",
     "vuex": "4"
@@ -23,7 +27,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^7.0.0"
+    "eslint-plugin-vue": "^7.0.0",
+    "firestore-export-import": "^0.17.0"
   },
   "browserslist": [
     "> 1%",

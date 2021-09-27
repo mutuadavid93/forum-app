@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import { findById } from '@/helpers';
 import ForumList from '@/components/ForumList.vue';
 
@@ -22,13 +23,20 @@ export default {
   },
   computed: {
     category() {
-      return findById(this.$store.state.categories, this.id);
+      // Fallback to empty {} if the fetchCategory async request isn't completed yet
+      return findById(this.$store.state.categories, this.id) || {};
     },
   },
   methods: {
+    ...mapActions(['fetchCategory', 'fetchForums']),
     getCategoryForums(category) {
       return this.$store.state.forums.filter((forum) => forum.categoryId === category.id);
     },
+  },
+
+  async created() {
+    const category = await this.fetchCategory({ id: this.id });
+    this.fetchForums({ ids: category.forums });
   },
 };
 </script>
