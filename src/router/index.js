@@ -7,7 +7,10 @@ import NotFound from '@/pages/NotFound.vue';
 import Forum from '@/pages/Forum.vue';
 import Category from '../pages/Category.vue';
 import Profile from '@/pages/Profile.vue';
+import Register from '@/pages/Register.vue';
+import SignIn from '@/pages/Signin.vue';
 import store from '@/store';
+
 // Define your routes
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -76,6 +79,10 @@ const routes = [
     //   });
     // },
   },
+
+  { path: '/register', name: 'Register', component: Register },
+  { path: '/signin', name: 'SignIn', component: SignIn },
+
   // will match everything and put it under `$route.params.pathMatch`
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
 ];

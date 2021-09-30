@@ -22,12 +22,22 @@ const makeAppendChildToParentMutation = ({ parent, child }) => (state, { childId
 };
 
 export default {
+  setAuthId(state, id) {
+    state.authId = id;
+  },
+
   setItem(state, { resource, item }) {
     upsert(state[resource], docToResource(item));
   },
+
+  setAuthUserUnsubscribe(state, unsubscribe) {
+    state.authUserUnsubscribe = unsubscribe;
+  },
+
   appendUnsubscribe(state, { unsubscribe }) {
     state.unsubscribes.push(unsubscribe);
   },
+
   clearAllUnscribes(state) {
     // Once on onSnapshot events are called and done, clean-up
     state.unsubscribes = [];

@@ -11,10 +11,12 @@ const initialState = {
   users: [],
   // Keep track on events fired by onSnapshot event
   unsubscribes: [],
+  authId: null,
+  authUserUnsubscribe: null,
 };
 
 export default createStore({
-  state: { ...initialState, authId: 'ALXhxjwgY9PinwNGHpfai6OWyDu2' },
+  state: { ...initialState },
   getters,
   mutations,
   actions,

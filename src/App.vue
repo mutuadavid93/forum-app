@@ -33,11 +33,9 @@ export default {
       NProgress.done();
     },
   },
-  // Fetch the authenticated user from state
-  mounted() {
-    this.fetchAuthUser();
-  },
   created() {
+    // Fetch the authenticated user from state
+    this.fetchAuthUser();
     NProgress.configure({
       speed: 200,
       showSpinner: false,

@@ -3,6 +3,31 @@ import firebase from 'firebase';
 import { findById, docToResource } from '@/helpers';
 
 export default {
+  // Authenticating Users via 3rd Party Providers
+  // eslint-disable-next-line consistent-return
+  async signInWithGoogle({ dispatch, commit }) {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const response = await firebase.auth().signInWithPopup(provider);
+    const { user } = response;
+    const userRef = firebase
+      .firestore()
+      .collection('users')
+      .doc(user.uid);
+    const userDoc = await userRef.get();
+
+    console.log('---- user exists ', userDoc.exists, userDoc);
+
+    if (!userDoc.exists) {
+      return dispatch('createUser', {
+        id: user.uid,
+        name: user.displayName,
+        email: user.email,
+        username: user.email,
+        avatar: user.photoURL,
+      });
+    }
+  },
+
   async createUser({ commit }, { email, name, username, avatar = null }) {
     const registeredAt = firebase.firestore.FieldValue.serverTimestamp();
     const usernameLower = username.toLowerCase();
@@ -76,6 +101,39 @@ export default {
     await postRef.update(post);
     const updatedPost = await postRef.get();
     commit('setItem', { resource: 'posts', item: updatedPost });
+  },
+
+  async registerUserWithEmailAndPassword(
+    { dispatch },
+    // eslint-disable-next-line comma-dangle
+    { avatar = null, email, name, username, password }
+  ) {
+    const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    await dispatch('registerUser', { id: result.user.uid, email, name, username, avatar });
+  },
+
+  signInWithEmailAndPassword(context, { email, password }) {
+    return firebase.auth().signInWithEmailAndPassword(email, password);
+  },
+
+  async signOut({ commit }) {
+    await firebase.auth().signOut();
+    commit('setAuthId', null);
+  },
+
+  async registerUser({ commit }, { id, name, username, email, avatar = null }) {
+    const registeredAt = firebase.firestore.FieldValue.serverTimestamp();
+    const usernameLower = username.toLowerCase();
+    const mail = email.toLowerCase();
+    const payload = { name, username, email: mail, avatar, registeredAt, usernameLower };
+    const userRef = await firebase
+      .firestore()
+      .collection('users')
+      .doc(id);
+    userRef.set(payload);
+    const newUser = await userRef.get();
+    commit('setItem', { resource: 'users', item: newUser });
+    return docToResource(newUser);
   },
 
   updateUser({ commit }, user) {
@@ -187,8 +245,19 @@ export default {
     return dispatch('fetchItem', { id, emoji: '🧛‍♂️', resource: 'users' });
   },
 
-  fetchAuthUser({ state, dispatch }) {
-    return dispatch('fetchItem', { id: state.authId, emoji: '🧛‍♂️', resource: 'users' });
+  fetchAuthUser({ dispatch, commit }) {
+    // Get the auth user id from firebase directly
+    const userId = firebase.auth().currentUser?.uid;
+    if (!userId) return;
+    dispatch('fetchItem', {
+      id: userId,
+      emoji: '🧛‍♂️',
+      resource: 'users',
+      handleUnsubscribe: (unsubscribe) => {
+        commit('setAuthUserUnsubscribe', unsubscribe);
+      },
+    });
+    commit('setAuthId', userId);
   },
 
   // ---------------------------------------
@@ -214,7 +283,7 @@ export default {
     return dispatch('fetchItems', { ids, emoji: '🧛‍♂️', resource: 'users' });
   },
 
-  fetchItem({ commit }, { id, emoji, resource }) {
+  fetchItem({ commit }, { id, emoji, resource, handleUnsubscribe = null }) {
     const db = firebase.firestore();
     return new Promise((resolve) => {
       const unsubscribe = db
@@ -225,7 +294,12 @@ export default {
           commit('setItem', { resource, item });
           resolve(item);
         });
-      commit('appendUnsubscribe', { unsubscribe });
+
+      if (handleUnsubscribe) {
+        handleUnsubscribe(unsubscribe);
+      } else {
+        commit('appendUnsubscribe', { unsubscribe });
+      }
     });
   },
 
@@ -237,5 +311,12 @@ export default {
   async unsubscribeAllSnapshots({ state, commit }) {
     state.unsubscribes.forEach((unsubscribe) => unsubscribe());
     commit('clearAllUnscribes');
+  },
+
+  async unsubscribeAuthUserSnapshot({ state, commit }) {
+    if (state.authUserUnsubscribe) {
+      state.authUserUnsubscribe();
+      commit('setAuthUserUnsubscribe', null);
+    }
   },
 };
