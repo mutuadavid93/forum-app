@@ -30,6 +30,10 @@ export default {
     upsert(state[resource], docToResource(item));
   },
 
+  setAuthObserverUnsubscribe(state, unsubscribe) {
+    state.authObserverUnsubscribe = unsubscribe;
+  },
+
   setAuthUserUnsubscribe(state, unsubscribe) {
     state.authUserUnsubscribe = unsubscribe;
   },

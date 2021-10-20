@@ -45,7 +45,7 @@ export default {
     async signIn() {
       try {
         await this.$store.dispatch('signInWithEmailAndPassword', { ...this.form });
-        this.$router.push('/');
+        this.successRedirect();
       } catch (error) {
         // eslint-disable-next-line no-alert
         alert(error.message);
@@ -53,7 +53,12 @@ export default {
     },
     async signInWithGoogle() {
       await this.$store.dispatch('signInWithGoogle');
-      this.$router.push('/');
+      this.successRedirect();
+    },
+    successRedirect() {
+      // Access query parameter value
+      const redirectTo = this.$route.query.redirectTo ?? { name: 'Home' };
+      this.$router.push(redirectTo);
     },
   },
   created() {

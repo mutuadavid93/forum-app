@@ -3,7 +3,14 @@
     <h1>
       Editing in <i>{{ thread.title }}</i>
     </h1>
-    <thread-editor :title="thread.title" :text="text" @update-post="savePost" @cancel="cancel" />
+    <thread-editor
+      :title="thread.title"
+      :text="text"
+      @update-post="savePost"
+      @cancel="cancel"
+      @dirty="formIsDirty = true"
+      @clean="formIsDirty = false"
+    />
   </div>
 </template>
 
@@ -20,6 +27,11 @@ export default {
     id: { type: String, required: true },
   },
   mixins: [asynDataStatus],
+  data() {
+    return {
+      formIsDirty: false,
+    };
+  },
   computed: {
     thread() {
       return findById(this.$store.state.threads, this.id);
@@ -47,6 +59,13 @@ export default {
     const thread = await this.fetchThread({ id: this.id });
     await this.fetchPost({ id: thread.posts[0] });
     this.asyncDataStatus_fetched();
+  },
+  // eslint-disable-next-line consistent-return
+  beforeRouteLeave() {
+    if (this.formIsDirty) {
+      const confirmed = window.confirm('Are you sure you want to leave? Unsaved changes will be lost!');
+      if (!confirmed) return false;
+    }
   },
 };
 </script>

@@ -1,9 +1,68 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // global rule applying to everything
     match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2021, 10, 20);
+      allow read: if
+        true
+    }
+
+     function userIsLoggedIn(){
+        // request is exposed in all rules
+        return request.auth != null
+      }
+
+      function isNewResource(){
+        // resource is the document you are attempting to create
+        return resource == null
+      }
+
+      function resourceBelongsToUser(){
+        // check authenticated user's uid against the created thread's userId
+        return request.auth.uid == resource.data.userId
+      }
+    
+    // threads	    
+    // Apply below rules when accessing any thread inside the threads collection
+    match /threads/{thread}{  
+      function isOnlyAppendingPostAndContributor(){
+ 	 			return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['posts', 'contributors'])
+			}
+
+      allow write: if
+      	// user is logged in and is creating a new thread or the thread is their's
+      	userIsLoggedIn() && (isNewResource() || resourceBelongsToUser())
+
+      allow update: if
+      	isOnlyAppendingPostAndContributor()
+    }
+
+    // posts
+    // creating a post creates a related post too. Thus similar rules to posts
+    match /posts/{post}{        
+      allow write: if
+      	// user is logged in and is creating a new post or the post is their's
+      	userIsLoggedIn() && (isNewResource() || resourceBelongsToUser())
+    }
+
+    // forums
+    match /forums/{forum}{
+  		function isOnlyAppendingThread(){
+    		return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['threads'])
+  		}
+  		allow update: if
+    		userIsLoggedIn() && isOnlyAppendingThread()
+		}
+
+    // users
+    match /users/{user}{
+      // allow anybody to register as a new user
+    	allow create: if
+      	true
+
+      // but an existing user can only update themselves
+      allow update: if
+      	request.auth.uid == resource.id 
     }
   }
-}
+} 

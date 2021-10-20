@@ -49,7 +49,25 @@ export default {
   },
   methods: {
     save() {
+      this.$emit('clean');
       this.$emit('update-post', { ...this.form });
+    },
+  },
+
+  watch: {
+    // writing a watcher as a property allows to specify more options
+    form: {
+      handler() {
+        // Check whether state and props are different
+        if (this.form.title !== this.title || this.form.text !== this.text) {
+          this.$emit('dirty');
+        } else {
+          this.$emit('clean');
+        }
+      },
+
+      // `deep` checks for change on the underlying properties change too
+      deep: true,
     },
   },
 };
