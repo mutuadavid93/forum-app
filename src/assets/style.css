@@ -1,3 +1,155 @@
+/*---------- RESET ----------*/
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+article,
+aside,
+footer,
+header,
+hgroup,
+nav,
+section,
+figure,
+figcaption {
+  display: block;
+  margin: 0;
+}
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+input,
+textarea {
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+input {
+  -webkit-appearance: none;
+}
+body {
+  -webkit-text-size-adjust: none;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+:focus {
+  outline: 0;
+}
+::-moz-focus-inner {
+  border: 0;
+}
+ins {
+  text-decoration: none;
+}
+del {
+  text-decoration: line-through;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+*,
+*:after,
+*:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+::-moz-selection {
+  background: #84bd00;
+  color: #fff;
+}
+::selection {
+  background: #84bd00;
+  color: #fff;
+}
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+}
+input[type="radio"] {
+  -webkit-appearance: radio;
+}
+
 body {
     background-color: #F6F8FF;
     min-height: 100vh;
@@ -2402,7 +2554,7 @@ figure {
 }
 
 .container {
-    /* display: flex; */
+    display: flex;
     max-width: 1200px;
     margin: 0 auto;
     align-items: center;
@@ -2560,6 +2712,3 @@ hr {
   left:50%;
   transform: translate(-50%, -50%);
 }
-
-
-.centred {text-align: center;}
