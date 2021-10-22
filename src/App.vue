@@ -2,15 +2,15 @@
   <the-navbar />
   <div class="container">
     <!--
-    router-view will always render the correct component configured at
-    main.js
+    router-view is a placeholder to render the component configured at
+    router/index.js route path
     Thus you don't need to register that component inside App.vue
 
     - NB:: prefer v-show to v-if if you want show something so more
     often on the DOM.
     - v-show has initial cost but v-if has even more throttle cost.
     -->
-    <router-view v-show="showPage" @ready="onPageReady" />
+    <router-view v-show="showPage" @ready="onPageReady" :key="$route.path" />
     <app-spinner v-show="!showPage" />
   </div>
 </template>

@@ -4,7 +4,12 @@
       Create new thread in <i>{{ forum.name }}</i>
     </h1>
 
-    <thread-editor @update-post="savePost" @cancel="cancel" />
+    <thread-editor
+      @update-post="savePost"
+      @cancel="cancel"
+      @dirty="formIsDirty = true"
+      @clean="formIsDirty = false"
+    />
   </div>
 </template>
 
@@ -19,6 +24,9 @@ export default {
   name: 'ThreadCreate',
   props: {
     forumId: { type: String, required: true },
+  },
+  data() {
+    return { formIsDirty: false };
   },
   mixins: [asynDataStatus],
   computed: {
@@ -44,6 +52,19 @@ export default {
     // make sure the forum is always available by fetching it from store
     await this.fetchForum({ id: this.forumId });
     this.asyncDataStatus_fetched();
+  },
+
+  // useful when the user was working on a page or had unfinished process and
+  // navigates away
+  // eslint-disable-next-line consistent-return
+  beforeRouteLeave() {
+    if (this.formIsDirty) {
+      const confirmed = window.confirm(
+        'Are you sure you want to leave? Unsaved changes will be lost',
+      );
+      // To abort a navigation we return false from a guard i.e. when we cancel
+      if (!confirmed) return false;
+    }
   },
 };
 </script>

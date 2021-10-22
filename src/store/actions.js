@@ -3,6 +3,28 @@ import firebase from 'firebase';
 import { findById, docToResource } from '@/helpers';
 
 export default {
+  initAuthentication({ commit, state }) {
+    // Unsubscribe from existing observers
+    if (state.authObserverUnsubscribe) state.authObserverUnsubscribe();
+
+    return new Promise((resolve) => {
+      // Use onAuthStateChanged Observer. When it changes, there should be a signed in user
+      // Turn off the observer when you leave a page and fire a new one(remove orphan observers)
+      const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+        this.dispatch('unsubscribeAuthUserSnapshot');
+
+        // Make sure to wait for the user to be fetched first
+        if (user) {
+          await this.dispatch('fetchAuthUser');
+          resolve(user);
+        } else {
+          resolve(null);
+        }
+      });
+      commit('setAuthObserverUnsubscribe', unsubscribe);
+    });
+  },
+
   // Authenticating Users via 3rd Party Providers
   // eslint-disable-next-line consistent-return
   async signInWithGoogle({ dispatch, commit }) {
@@ -136,7 +158,23 @@ export default {
     return docToResource(newUser);
   },
 
-  updateUser({ commit }, user) {
+  async updateUser({ commit }, user) {
+    // NB: Firebase doesn't entertain undefined values instead fallback to null
+    const updates = {
+      avatar: user.avatar || null,
+      username: user.username || null,
+      name: user.name || null,
+      bio: user.bio || null,
+      website: user.website || null,
+      email: user.email || null,
+      location: user.location || null,
+    };
+    const userRef = firebase
+      .firestore()
+      .collection('users')
+      .doc(user.id);
+    // When updating a single record, don't use batch, update it directly
+    await userRef.update(updates);
     commit('setItem', { resource: 'users', item: user });
   },
 
@@ -208,6 +246,19 @@ export default {
     return docToResource(newThread);
   },
 
+  async fetchAuthUsersPosts({ commit, state }) {
+    const posts = await firebase
+      .firestore()
+      .collection('posts')
+      .where('userId', '==', state.authId)
+      .get(); // get() executes the query
+
+    // Update state
+    posts.forEach((item) => {
+      commit('setItem', { resource: 'posts', item });
+    });
+  },
+
   fetchAllCategories({ commit }) {
     const db = firebase.firestore();
     return new Promise((resolve) => {
@@ -245,11 +296,11 @@ export default {
     return dispatch('fetchItem', { id, emoji: '🧛‍♂️', resource: 'users' });
   },
 
-  fetchAuthUser({ dispatch, commit }) {
+  async fetchAuthUser({ dispatch, commit }) {
     // Get the auth user id from firebase directly
     const userId = firebase.auth().currentUser?.uid;
     if (!userId) return;
-    dispatch('fetchItem', {
+    await dispatch('fetchItem', {
       id: userId,
       emoji: '🧛‍♂️',
       resource: 'users',
@@ -283,16 +334,20 @@ export default {
     return dispatch('fetchItems', { ids, emoji: '🧛‍♂️', resource: 'users' });
   },
 
-  fetchItem({ commit }, { id, emoji, resource, handleUnsubscribe = null }) {
+  fetchItem({ commit }, { id, resource, handleUnsubscribe = null }) {
     const db = firebase.firestore();
     return new Promise((resolve) => {
       const unsubscribe = db
         .collection(resource)
         .doc(id)
         .onSnapshot((doc) => {
-          const item = { ...doc.data(), id: doc.id };
-          commit('setItem', { resource, item });
-          resolve(item);
+          if (doc.exists) {
+            const item = { ...doc.data(), id: doc.id };
+            commit('setItem', { resource, item });
+            resolve(item);
+          } else {
+            resolve(null);
+          }
         });
 
       if (handleUnsubscribe) {

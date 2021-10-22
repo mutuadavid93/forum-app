@@ -10,6 +10,7 @@ import Profile from '@/pages/Profile.vue';
 import Register from '@/pages/Register.vue';
 import SignIn from '@/pages/Signin.vue';
 import store from '@/store';
+import { findById } from '@/helpers';
 
 // Define your routes
 const routes = [
@@ -19,12 +20,14 @@ const routes = [
     name: 'ThreadCreate',
     component: ThreadCreate,
     props: true,
+    meta: { requiresAuth: true },
   },
   {
     path: '/thread/:id/edit',
     name: 'ThreadEdit',
     component: ThreadEdit,
     props: true,
+    meta: { requiresAuth: true },
   },
   {
     path: '/forum/:id',
@@ -38,7 +41,9 @@ const routes = [
     path: '/me',
     name: 'Profile',
     component: Profile,
-    meta: { toTop: true, smoothScroll: true },
+
+    // Route's meta fields help add custom attributes to a route
+    meta: { toTop: true, smoothScroll: true, requiresAuth: true },
   },
   {
     path: '/me/edit',
@@ -46,6 +51,7 @@ const routes = [
     component: Profile,
     // Update your props here too e.g. a negation
     props: { edit: true },
+    meta: { requiresAuth: true },
   },
   {
     path: '/category/:id',
@@ -61,27 +67,50 @@ const routes = [
     props: true,
 
     // Route Guard; Handle wrong thread paths
-    // async beforeEnter(to, from, next) {
-    //   await store.dispatch('fetchThread', { id: to.params.id, once: true });
-    //   // check if thread exists
-    //   const threadExists = findById(store.state.threads.items, to.params.id);
-    //   // if it exists, continue
-    //   if (threadExists) {
-    //     return next();
-    //   }
-    //   return next({
-    //     name: 'NotFound',
-    //     // Give the user a chance to edit their wrong url
-    //     params: { pathMatch: to.path.substring(1).split('/') },
-    //     // Preserve existing query and hash
-    //     query: to.query,
-    //     hash: to.hash,
-    //   });
-    // },
+    async beforeEnter(to, from, next) {
+      await store.dispatch('fetchThread', { id: to.params.id });
+      // check if thread exists
+      const threadExists = findById(store.state.threads, to.params.id);
+      // if it exists, continue
+      if (threadExists) {
+        return next();
+      }
+      return next({
+        name: 'NotFound',
+        // Give the user a chance to edit their wrong url
+        params: { pathMatch: to.path.substring(1).split('/') },
+        // Preserve existing query and hash
+        query: to.query,
+        hash: to.hash,
+      });
+    },
   },
 
-  { path: '/register', name: 'Register', component: Register },
-  { path: '/signin', name: 'SignIn', component: SignIn },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+
+    // A logged in user doesn't need to see certain pages
+    meta: { requiresGuest: true },
+  },
+  {
+    path: '/signin',
+    name: 'SignIn',
+    component: SignIn,
+    meta: { requiresGuest: true },
+  },
+
+  // SignOut is a componentless route
+  {
+    path: '/signout',
+    name: 'SignOut',
+    async beforeEnter() {
+      await store.dispatch('signOut');
+      // Redirect to home page
+      return { name: 'Home' };
+    },
+  },
 
   // will match everything and put it under `$route.params.pathMatch`
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
@@ -102,9 +131,23 @@ const router = createRouter({
   },
 });
 
-// Unsubscribe from onSnapshot events
-router.beforeEach(() => {
+// Below is a global navigation guard, runs before each route in the application
+// eslint-disable-next-line consistent-return
+router.beforeEach(async (to, from) => {
+  await store.dispatch('initAuthentication');
+  // Unsubscribe from onSnapshot events
   store.dispatch('unsubscribeAllSnapshots');
+
+  // Check whether a page we are navigating to has a specific meta and act
+  if (to.meta.requiresAuth && !store.state.authId) {
+    // Add query params to be able to redirect to the place user intended
+    return { name: 'SignIn', query: { redirectTo: to.path } };
+  }
+
+  // If it's a loggedin user, redirect to home page
+  if (to.meta.requiresGuest && store.state.authId) {
+    return { name: 'Home' };
+  }
 });
 
 export default router;

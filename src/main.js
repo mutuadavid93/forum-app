@@ -13,14 +13,6 @@ library.add(faPencilAlt);
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Use onAuthStateChanged Observer. When it changes, there should be a signed in user
-firebase.auth().onAuthStateChanged((user) => {
-  store.dispatch('unsubscribeAuthUserSnapshot');
-  if (user) {
-    store.dispatch('fetchAuthUser');
-  }
-});
-
 const forumApp = createApp(App);
 forumApp.use(router);
 forumApp.use(store);
