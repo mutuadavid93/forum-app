@@ -68,9 +68,9 @@ const routes = [
 
     // Route Guard; Handle wrong thread paths
     async beforeEnter(to, from, next) {
-      await store.dispatch('fetchThread', { id: to.params.id });
+      await store.dispatch('threads/fetchThread', { id: to.params.id });
       // check if thread exists
-      const threadExists = findById(store.state.threads, to.params.id);
+      const threadExists = findById(store.state.threads.items, to.params.id);
       // if it exists, continue
       if (threadExists) {
         return next();
@@ -106,7 +106,7 @@ const routes = [
     path: '/signout',
     name: 'SignOut',
     async beforeEnter() {
-      await store.dispatch('signOut');
+      await store.dispatch('auth/signOut');
       // Redirect to home page
       return { name: 'Home' };
     },
@@ -134,18 +134,18 @@ const router = createRouter({
 // Below is a global navigation guard, runs before each route in the application
 // eslint-disable-next-line consistent-return
 router.beforeEach(async (to, from) => {
-  await store.dispatch('initAuthentication');
+  await store.dispatch('auth/initAuthentication');
   // Unsubscribe from onSnapshot events
   store.dispatch('unsubscribeAllSnapshots');
 
   // Check whether a page we are navigating to has a specific meta and act
-  if (to.meta.requiresAuth && !store.state.authId) {
+  if (to.meta.requiresAuth && !store.state.auth.authId) {
     // Add query params to be able to redirect to the place user intended
     return { name: 'SignIn', query: { redirectTo: to.path } };
   }
 
   // If it's a loggedin user, redirect to home page
-  if (to.meta.requiresGuest && store.state.authId) {
+  if (to.meta.requiresGuest && store.state.auth.authId) {
     return { name: 'Home' };
   }
 });

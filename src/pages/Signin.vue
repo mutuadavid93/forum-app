@@ -44,7 +44,7 @@ export default {
   methods: {
     async signIn() {
       try {
-        await this.$store.dispatch('signInWithEmailAndPassword', { ...this.form });
+        await this.$store.dispatch('auth/signInWithEmailAndPassword', { ...this.form });
         this.successRedirect();
       } catch (error) {
         // eslint-disable-next-line no-alert
@@ -52,7 +52,7 @@ export default {
       }
     },
     async signInWithGoogle() {
-      await this.$store.dispatch('signInWithGoogle');
+      await this.$store.dispatch('auth/signInWithGoogle');
       this.successRedirect();
     },
     successRedirect() {

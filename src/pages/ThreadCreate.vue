@@ -31,11 +31,12 @@ export default {
   mixins: [asynDataStatus],
   computed: {
     forum() {
-      return findById(this.$store.state.forums, this.forumId);
+      return findById(this.$store.state.forums.items, this.forumId);
     },
   },
   methods: {
-    ...mapActions(['fetchForum', 'createThread']),
+    ...mapActions('forums', ['fetchForum']),
+    ...mapActions('threads', ['createThread']),
     async savePost({ title, text }) {
       const thread = await this.createThread({
         title,
@@ -59,6 +60,7 @@ export default {
   // eslint-disable-next-line consistent-return
   beforeRouteLeave() {
     if (this.formIsDirty) {
+      // prettier-ignore
       const confirmed = window.confirm(
         'Are you sure you want to leave? Unsaved changes will be lost',
       );

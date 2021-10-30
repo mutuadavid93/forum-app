@@ -37,12 +37,12 @@ export default {
     UserProfileCardEditor,
   },
   computed: {
-    // map `this.user` to `this.$store.getters.authUser` via an Object
-    ...mapGetters({ user: 'authUser' }),
+    // map state via an Object
+    ...mapGetters('auth', { user: 'authUser' }),
   },
 
   async created() {
-    await this.$store.dispatch('fetchAuthUsersPosts');
+    await this.$store.dispatch('auth/fetchAuthUsersPosts');
     this.asyncDataStatus_fetched();
   },
 };

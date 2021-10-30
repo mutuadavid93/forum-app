@@ -54,17 +54,17 @@ export default {
   mixins: [asynDataStatus],
 
   computed: {
-    ...mapGetters(['authUser']),
+    ...mapGetters('auth', ['authUser']),
     threads() {
-      return this.$store.state.threads;
+      return this.$store.state.threads.items;
     },
     posts() {
-      return this.$store.state.posts;
+      return this.$store.state.posts.items;
     },
     thread() {
       // this.id is also available under `this.$route.params.id`
       // Invoke a getter which accepts an argument e.g. `thread(id)` below
-      return this.$store.getters.thread(this.id);
+      return this.$store.getters['threads/thread'](this.id);
     },
     threadPosts() {
       return this.posts.filter((post) => post.threadId === this.id);
@@ -72,14 +72,9 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      'createPost',
-      'fetchThread',
-      'fetchUser',
-      'fetchPosts',
-      'fetchUsers',
-      'createPost',
-    ]),
+    ...mapActions('threads', ['fetchThread']),
+    ...mapActions('users', ['fetchUsers']),
+    ...mapActions('posts', ['fetchPosts', 'createPost']),
     save(eventData) {
       const post = {
         ...eventData.post,

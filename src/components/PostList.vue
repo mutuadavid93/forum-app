@@ -16,7 +16,7 @@
           {{ post.text }}
         </p>
         <a
-          v-if="post.userId === $store.state.authId"
+          v-if="post.userId === $store.state.auth.authId"
           href="#"
           @click.prevent="toggleEditMode(post.id)"
           style="margin-left: auto; padding-left:10px;"
@@ -49,9 +49,9 @@ export default {
     return { editing: null };
   },
   methods: {
-    ...mapActions(['updatePost']),
+    ...mapActions('posts', ['updatePost']),
     userById(userId) {
-      return this.$store.getters.user(userId);
+      return this.$store.getters['users/user'](userId);
     },
     toggleEditMode(id) {
       // toggler
@@ -64,7 +64,7 @@ export default {
   },
   computed: {
     users() {
-      return this.$store.state.users;
+      return this.$store.state.users.items;
     },
   },
 };

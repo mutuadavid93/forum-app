@@ -28,13 +28,14 @@ export default {
   computed: {
     category() {
       // Fallback to empty {} if the fetchCategory async request isn't completed yet
-      return findById(this.$store.state.categories, this.id) || {};
+      return findById(this.$store.state.categories.items, this.id) || {};
     },
   },
   methods: {
-    ...mapActions(['fetchCategory', 'fetchForums']),
+    ...mapActions('categories', ['fetchCategory']),
+    ...mapActions('forums', ['fetchForums']),
     getCategoryForums(category) {
-      return this.$store.state.forums.filter((forum) => forum.categoryId === category.id);
+      return this.$store.state.forums.items.filter((forum) => forum.categoryId === category.id);
     },
   },
 
