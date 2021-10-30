@@ -34,15 +34,16 @@ export default {
   },
   computed: {
     thread() {
-      return findById(this.$store.state.threads, this.id);
+      return findById(this.$store.state.threads.items, this.id);
     },
     text() {
-      const post = findById(this.$store.state.posts, this.thread.posts[0]);
+      const post = findById(this.$store.state.posts.items, this.thread.posts[0]);
       return post ? post.text : '';
     },
   },
   methods: {
-    ...mapActions(['updateThread', 'updateThread', 'fetchThread', 'fetchPost']),
+    ...mapActions('threads', ['updateThread', 'updateThread', 'fetchThread']),
+    ...mapActions('posts', ['fetchPost']),
     async savePost({ title, text }) {
       const thread = await this.updateThread({
         id: this.id,
@@ -63,7 +64,10 @@ export default {
   // eslint-disable-next-line consistent-return
   beforeRouteLeave() {
     if (this.formIsDirty) {
-      const confirmed = window.confirm('Are you sure you want to leave? Unsaved changes will be lost!');
+      // prettier-ignore
+      const confirmed = window.confirm(
+        'Are you sure you want to leave? Unsaved changes will be lost!',
+      );
       if (!confirmed) return false;
     }
   },

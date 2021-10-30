@@ -37,16 +37,18 @@ export default {
   components: { ThreadList },
   computed: {
     forum() {
-      return findById(this.$store.state.forums, this.id);
+      return findById(this.$store.state.forums.items, this.id);
     },
     threads() {
       // Make sure the forum exists before trying to access it's threads
       if (!this.forum) return [];
-      return this.forum.threads.map((threadId) => this.$store.getters.thread(threadId));
+      return this.forum.threads.map((threadId) => this.$store.getters['threads/thread'](threadId));
     },
   },
   methods: {
-    ...mapActions(['fetchForum', 'fetchThreads', 'fetchUsers']),
+    ...mapActions('forums', ['fetchForum']),
+    ...mapActions('threads', ['fetchThreads']),
+    ...mapActions('users', ['fetchUsers']),
   },
   async created() {
     // Tip:: We need to use created() hook, since we are accessing `this.id`

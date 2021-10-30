@@ -18,11 +18,14 @@ export default {
   mixins: [asynDataStatus],
   computed: {
     categories() {
-      return this.$store.state.categories;
+      return this.$store.state.categories.items;
     },
   },
   methods: {
-    ...mapActions(['fetchAllCategories', 'fetchForums']),
+    // Tip:: If two actions/getters belong to different modules,
+    // invoke them separately with their respective namespaces
+    ...mapActions('categories', ['fetchAllCategories']),
+    ...mapActions('forums', ['fetchForums']),
   },
   async created() {
     // Since we are not effecting anything inside component's data property

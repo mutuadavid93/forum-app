@@ -94,7 +94,7 @@ export default {
   methods: {
     save() {
       // We still need to clone the user inside state not update it directly
-      this.$store.dispatch('updateUser', { ...this.activeUser });
+      this.$store.dispatch('users/updateUser', { ...this.activeUser });
       // Redirect the user on save
       this.$router.push({ name: 'Profile' });
     },

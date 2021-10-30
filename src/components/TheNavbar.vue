@@ -20,7 +20,9 @@ with `The` e.g. TheNavbar -->
           <a @click.prevent="userDropDownOpen = !userDropDownOpen">
             <img
               class="avatar-small"
-              :src="authUser.avatar || 'http://0.gravatar.com/avatar/d842cb7fa58db70851af711c583a2028'"
+              :src="
+                authUser.avatar || 'http://0.gravatar.com/avatar/d842cb7fa58db70851af711c583a2028'
+              "
               :alt="`${authUser.name} profile picture`"
             />
             <span>
@@ -40,7 +42,7 @@ with `The` e.g. TheNavbar -->
                 >
               </li>
               <li class="dropdown-menu-item">
-                <a @click.prevent="$store.dispatch('signOut')">Sign Out</a>
+                <a @click.prevent="$store.dispatch('auth/signOut')">Sign Out</a>
               </li>
             </ul>
           </div>
@@ -64,7 +66,8 @@ export default {
     return { userDropDownOpen: false };
   },
   computed: {
-    ...mapGetters(['authUser']),
+    // Access a namespaced getter from a component
+    ...mapGetters('auth', ['authUser']),
   },
 };
 </script>
