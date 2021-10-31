@@ -1,5 +1,6 @@
 /* eslint-disable comma-dangle */
 import firebase from 'firebase';
+import chunk from 'lodash/chunk';
 import { findById, docToResource, makeAppendChildToParentMutation } from '@/helpers';
 
 export default {
@@ -126,6 +127,13 @@ export default {
     fetchThreads({ dispatch }, { ids }) {
       return dispatch('fetchItems', { ids, emoji: '📄', resource: 'threads' }, { root: true });
     },
+
+    fetchThreadsByPage({ dispatch, commit }, { ids, page, perPage = 5 }) {
+      commit('clearThreads');
+      const chunks = chunk(ids, perPage);
+      const limitedIds = chunks[page - 1];
+      return dispatch('fetchThreads', { ids: limitedIds });
+    },
   },
   mutations: {
     appendPostToThread: makeAppendChildToParentMutation({ parent: 'threads', child: 'posts' }),
@@ -133,5 +141,8 @@ export default {
       parent: 'threads',
       child: 'contributors',
     }),
+    clearThreads(state) {
+      state.items = [];
+    },
   },
 };
