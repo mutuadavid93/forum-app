@@ -7,6 +7,8 @@ import App from '@/App.vue';
 import store from '@/store';
 import router from '@/router';
 import { firebaseConfig } from '@/config/firebase';
+import ClickOutSideDirective from '@/plugins/ClickOutsideDirective';
+import PageScrollDirective from '@/plugins/PageScrollDirective';
 
 library.add(faPencilAlt);
 
@@ -16,6 +18,10 @@ firebase.initializeApp(firebaseConfig);
 const forumApp = createApp(App);
 forumApp.use(router);
 forumApp.use(store);
+
+// Register plugins
+forumApp.use(PageScrollDirective);
+forumApp.use(ClickOutSideDirective);
 
 // Implicitly import and register Global components
 const requireComponent = require.context('@/components', true, /App[A-Z]\w+\.(vue|js)$/);
