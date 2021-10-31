@@ -2714,3 +2714,12 @@ hr {
 }
 
 .text-centre{text-align: center;}
+
+/* style.css */
+.Pagination{
+  justify-content: center;
+  margin: 40px !important;
+}
+.Pagination .Page-active{
+  color:white;
+} 

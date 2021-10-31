@@ -10,7 +10,11 @@
     often on the DOM.
     - v-show has initial cost but v-if has even more throttle cost.
     -->
-    <router-view v-show="showPage" @ready="onPageReady" :key="$route.path" />
+    <router-view
+      v-show="showPage"
+      @ready="onPageReady"
+      :key="`${$route.path}${JSON.stringify($route.query)}`"
+    />
     <app-spinner v-show="!showPage" />
   </div>
 </template>
@@ -53,7 +57,7 @@ export default {
 /* Global Styles Live Here, so they can be minified when in production */
 @import 'assets/style.css';
 @import '~nprogress/nprogress.css';
-#nprogress .bar{
-  background: #4E9C7F;
+#nprogress .bar {
+  background: #4e9c7f;
 }
 </style>

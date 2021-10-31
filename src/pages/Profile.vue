@@ -13,6 +13,13 @@
         </div>
         <hr />
         <post-list :posts="user.posts" />
+
+        <!--
+          Place infinite scroll at the end of the posts' list so that it
+          can intersect at the end with the screen firing load event.
+          Dispatch fetching of more posts
+         -->
+        <app-infinite-scroll @load="fetchUserPosts" :done="user.posts.length == user.postsCount" />
       </div>
     </div>
   </div>
@@ -39,11 +46,20 @@ export default {
   computed: {
     // map state via an Object
     ...mapGetters('auth', { user: 'authUser' }),
+    lastPostFetched() {
+      if (this.user.posts.length === 0) return null;
+      return this.user.posts[this.user.posts.length - 1];
+    },
+  },
+  methods: {
+    fetchUserPosts() {
+      return this.$store.dispatch('auth/fetchAuthUsersPosts', { startAfter: this.lastPostFetched });
+    },
   },
 
   async created() {
-    await this.$store.dispatch('auth/fetchAuthUsersPosts');
-    this.asyncDataStatus_fetched();
+    await this.fetchUserPosts();
+    await this.asyncDataStatus_fetched();
   },
 };
 </script>

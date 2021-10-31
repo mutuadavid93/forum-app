@@ -9,6 +9,7 @@ import router from '@/router';
 import { firebaseConfig } from '@/config/firebase';
 import ClickOutSideDirective from '@/plugins/ClickOutsideDirective';
 import PageScrollDirective from '@/plugins/PageScrollDirective';
+import Vue3Pagination from '@/plugins/Vue3Pagination';
 
 library.add(faPencilAlt);
 
@@ -22,6 +23,7 @@ forumApp.use(store);
 // Register plugins
 forumApp.use(PageScrollDirective);
 forumApp.use(ClickOutSideDirective);
+forumApp.use(Vue3Pagination);
 
 // Implicitly import and register Global components
 const requireComponent = require.context('@/components', true, /App[A-Z]\w+\.(vue|js)$/);

@@ -64,8 +64,6 @@ export default {
         .doc(user.uid);
       const userDoc = await userRef.get();
 
-      console.log('---- user exists ', userDoc.exists, userDoc);
-
       if (!userDoc.exists) {
         return dispatch(
           'users/createUser',
@@ -86,7 +84,7 @@ export default {
       commit('setAuthId', null);
     },
 
-    fetchAuthUser: async ({ dispatch, state, commit }) => {
+    fetchAuthUser: async ({ dispatch, commit }) => {
       const userId = firebase.auth().currentUser?.uid;
       if (!userId) return;
       await dispatch(
@@ -104,12 +102,28 @@ export default {
       commit('setAuthId', userId);
     },
 
-    async fetchAuthUsersPosts({ commit, state }) {
-      const posts = await firebase
+    async fetchAuthUsersPosts({ commit, state }, { startAfter }) {
+      // limit(number)
+      // startAfter(doc), where to start
+      // orderBy()
+      let query = await firebase
         .firestore()
         .collection('posts')
         .where('userId', '==', state.authId)
-        .get(); // get() executes the query
+        .orderBy('publishedAt', 'desc')
+        .limit(3);
+
+      // For the first page startAfter is null
+      if (startAfter) {
+        // Get the actual document from firestore
+        const doc = await firebase
+          .firestore()
+          .collection('posts')
+          .doc(startAfter.id)
+          .get();
+        query = query.startAfter(doc);
+      }
+      const posts = await query.get(); // get() executes the query
 
       // Update state
       posts.forEach((item) => {
