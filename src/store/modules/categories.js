@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import { makeFetchItemAction, makeFetchItemsAction } from '@/helpers';
 
 export default {
   namespaced: true,
@@ -7,13 +8,15 @@ export default {
   },
   getters: {},
   actions: {
-    fetchCategory({ dispatch }, { id }) {
-      return dispatch('fetchItem', { emoji: '🏷', resource: 'categories', id }, { root: true });
-    },
+    // fetchCategory({ dispatch }, { id }) {
+    //   return dispatch('fetchItem', { emoji: '🏷', resource: 'categories', id }, { root: true });
+    // },
+    fetchCategory: makeFetchItemAction({ emoji: '🏷', resource: 'categories' }),
 
-    fetchCategories({ dispatch }, { ids }) {
-      return dispatch('fetchItems', { resource: 'categories', ids, emoji: '🏷' }, { root: true });
-    },
+    // fetchCategories({ dispatch }, { ids }) {
+    //   return dispatch('fetchItems', { resource: 'categories', ids, emoji: '🏷' }, { root: true });
+    // },
+    fetchCategories: makeFetchItemsAction({ emoji: '🏷', resource: 'categories' }),
 
     fetchAllCategories({ commit }) {
       const db = firebase.firestore();

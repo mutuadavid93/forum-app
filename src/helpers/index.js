@@ -39,3 +39,17 @@ export const makeAppendChildToParentMutation = ({ parent, child }) => {
     }
   };
 };
+
+// eslint-disable-next-line arrow-body-style
+export const makeFetchItemAction = ({ emoji, resource }) => {
+  return ({ dispatch }, payload) =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    dispatch('fetchItem', { emoji, resource, ...payload }, { root: true });
+};
+
+// eslint-disable-next-line arrow-body-style
+export const makeFetchItemsAction = ({ emoji, resource }) => {
+  return ({ dispatch }, payload) =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    dispatch('fetchItems', { emoji, resource, ...payload }, { root: true });
+};
