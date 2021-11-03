@@ -1,5 +1,6 @@
 /* eslint-disable comma-dangle */
 import firebase from 'firebase';
+import { makeFetchItemAction, makeFetchItemsAction } from '@/helpers';
 
 export default {
   namespaced: true,
@@ -82,13 +83,15 @@ export default {
       commit('setItem', { resource: 'posts', item: updatedPost }, { root: true });
     },
 
-    fetchPost({ dispatch }, { id }) {
-      return dispatch('fetchItem', { id, emoji: '🦈', resource: 'posts' }, { root: true });
-    },
+    // fetchPost({ dispatch }, { id }) {
+    //   return dispatch('fetchItem', { id, emoji: '🦈', resource: 'posts' }, { root: true });
+    // },
 
-    fetchPosts({ dispatch }, { ids }) {
-      return dispatch('fetchItems', { ids, emoji: '🦈', resource: 'posts' }, { root: true });
-    },
+    // fetchPosts({ dispatch }, { ids }) {
+    //   return dispatch('fetchItems', { ids, emoji: '🦈', resource: 'posts' }, { root: true });
+    // },
+    fetchPost: makeFetchItemAction({ emoji: '💬', resource: 'posts' }),
+    fetchPosts: makeFetchItemsAction({ emoji: '💬', resource: 'posts' }),
   },
   mutations: {},
 };

@@ -1,7 +1,13 @@
 /* eslint-disable comma-dangle */
 import firebase from 'firebase';
 import chunk from 'lodash/chunk';
-import { findById, docToResource, makeAppendChildToParentMutation } from '@/helpers';
+import {
+  findById,
+  docToResource,
+  makeAppendChildToParentMutation,
+  makeFetchItemAction,
+  makeFetchItemsAction,
+} from '@/helpers';
 
 export default {
   namespaced: true,
@@ -120,13 +126,9 @@ export default {
       return docToResource(newThread);
     },
 
-    fetchThread({ dispatch }, { id }) {
-      return dispatch('fetchItem', { id, emoji: '📄', resource: 'threads' }, { root: true });
-    },
+    fetchThread: makeFetchItemAction({ emoji: '📄', resource: 'threads' }),
 
-    fetchThreads({ dispatch }, { ids }) {
-      return dispatch('fetchItems', { ids, emoji: '📄', resource: 'threads' }, { root: true });
-    },
+    fetchThreads: makeFetchItemsAction({ emoji: '📄', resource: 'threads' }),
 
     fetchThreadsByPage({ dispatch, commit }, { ids, page, perPage = 5 }) {
       commit('clearThreads');

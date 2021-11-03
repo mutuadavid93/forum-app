@@ -36,6 +36,8 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import difference from 'lodash/difference';
+import useNotifications from '@/composables/useNotifications';
 import PostList from '@/components/PostList.vue';
 import PostEditor from '@/components/PostEditor.vue';
 import asynDataStatus from '@/mixins/asyncDataStatus';
@@ -50,6 +52,10 @@ export default {
       required: true,
       type: String,
     },
+  },
+  setup() {
+    const { addNotification } = useNotifications();
+    return { addNotification };
   },
   mixins: [asynDataStatus],
 
@@ -82,16 +88,44 @@ export default {
       };
       this.createPost(post);
     },
+    async fetchPostsWithUsers(ids) {
+      // fetch posts
+      const posts = await this.fetchPosts({
+        ids,
+        onSnapshot: ({ isLocal, previousItem }) => {
+          // prettier-ignore
+          // eslint-disable-next-line max-len
+          if (!this.asyncDataStatus_ready || isLocal || (previousItem?.edited && !previousItem?.edited?.at)) return;
+          this.addNotification({ message: 'Thread recently updated', timeout: 5000 });
+        },
+      });
+      // fetch the users associated with the posts
+      const users = posts.map((post) => post.userId).concat(this.thread.userId);
+      await this.fetchUsers({ ids: users });
+    },
   },
 
   async created() {
     // fetch the thread
-    const thread = await this.fetchThread({ id: this.id });
-    // fetch posts
-    const posts = await this.fetchPosts({ ids: thread.posts });
-    // fetch the users associated with the posts
-    const users = posts.map((post) => post.userId).concat(thread.userId);
-    await this.fetchUsers({ ids: users });
+    const thread = await this.fetchThread({
+      id: this.id,
+      onSnapshot: async ({ isLocal, item, previousItem }) => {
+        // If data isn't available yet or
+        // we are on the current thread do not show notifications
+        if (!this.asyncDataStatus_ready || isLocal) return;
+        const newPostIds = difference(item.posts, previousItem.posts);
+        const hasNewPosts = newPostIds.length > 0;
+
+        // fetch the new posts
+        if (hasNewPosts) {
+          await this.fetchPostsWithUsers(newPostIds);
+        } else {
+          // if thread being updated, send notification
+          this.addNotification({ message: 'Thread recently updated!', timeout: 5000 });
+        }
+      },
+    });
+    await this.fetchPostsWithUsers(thread.posts);
     this.asyncDataStatus_fetched();
   },
 };

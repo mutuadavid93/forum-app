@@ -1,6 +1,6 @@
 {
   "singleQuote": true,
   "disableLanguages": ["js"],
-  "trailingComma": "es5",
+  "trailingComma" : "all",
   "arrowParens": "always"
 }

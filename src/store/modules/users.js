@@ -1,6 +1,12 @@
 /* eslint-disable object-curly-newline */
 import firebase from 'firebase';
-import { docToResource, makeAppendChildToParentMutation, findById } from '@/helpers';
+import {
+  docToResource,
+  makeAppendChildToParentMutation,
+  findById,
+  makeFetchItemAction,
+  makeFetchItemsAction,
+} from '@/helpers';
 
 export default {
   namespaced: true,
@@ -84,13 +90,15 @@ export default {
       return docToResource(newUser);
     },
 
-    fetchUser({ dispatch }, { id }) {
-      return dispatch('fetchItem', { id, emoji: '🧛‍♂️', resource: 'users' }, { root: true });
-    },
+    // fetchUser({ dispatch }, { id }) {
+    //   return dispatch('fetchItem', { id, emoji: '🧛‍♂️', resource: 'users' }, { root: true });
+    // },
 
-    fetchUsers({ dispatch }, { ids }) {
-      return dispatch('fetchItems', { ids, emoji: '🧛‍♂️', resource: 'users' }, { root: true });
-    },
+    // fetchUsers({ dispatch }, { ids }) {
+    //   return dispatch('fetchItems', { ids, emoji: '🧛‍♂️', resource: 'users' }, { root: true });
+    // },
+    fetchUser: makeFetchItemAction({ emoji: '🙋', resource: 'users' }),
+    fetchUsers: makeFetchItemsAction({ resource: 'users', emoji: '🙋' }),
   },
   mutations: {
     appendThreadToUser: makeAppendChildToParentMutation({ parent: 'users', child: 'threads' }),
