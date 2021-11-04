@@ -26,11 +26,9 @@ with `The` e.g. TheNavbar -->
             @click.prevent="userDropDownOpen = !userDropDownOpen"
             v-click-outside="() => (userDropDownOpen = false)"
           >
-            <img
+            <app-avatar-img
               class="avatar-small"
-              :src="
-                authUser.avatar || 'http://0.gravatar.com/avatar/d842cb7fa58db70851af711c583a2028'
-              "
+              :src="authUser.avatar"
               :alt="`${authUser.name} profile picture`"
             />
             <span>

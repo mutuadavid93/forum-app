@@ -1,13 +1,29 @@
 <template>
   <div class="profile-card">
     <form @submit.prevent="save">
-      <p class="text-center">
-        <img
-          :src="user.avatar"
-          :alt="`${user.name} profile picture`"
-          class="avatar-xlarge img-update"
-        />
+      <p class="text-center avatar-edit">
+        <label for="avatar">
+          <app-avatar-img
+            :src="activeUser.avatar"
+            :alt="`${user.name} profile picture`"
+            class="avatar-xlarge img-update"
+          />
+          <div class="avatar-upload-overlay">
+            <app-spinner v-if="uploadingImage" color="white" />
+            <fa v-else icon="camera" size="3x" :style="{ color: 'white', opacity: '0.8' }" />
+          </div>
+          <!-- Since initially the image is here...we hide input field -->
+          <input
+            accept="image/*"
+            v-show="false"
+            type="file"
+            id="avatar"
+            @change="handleAvatarChange"
+          />
+        </label>
       </p>
+
+      <user-profile-card-editor-random-avatar @hit="activeUser.avatar = $event" />
 
       <div class="form-group">
         <input
@@ -70,7 +86,7 @@
       </div>
 
       <div class="btn-group space-between">
-        <button class="btn-ghost" @click="cancel">Cancel</button>
+        <button class="btn-ghost" @click.prevent="cancel">Cancel</button>
         <button type="submit" class="btn-blue">Save</button>
       </div>
     </form>
@@ -78,7 +94,11 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+import UserProfileCardEditorRandomAvatar from '@/components/UserProfileCardEditorRandomAvatar.vue';
+
 export default {
+  components: { UserProfileCardEditorRandomAvatar },
   name: 'UserProfileCardEditor',
   props: {
     user: {
@@ -89,10 +109,29 @@ export default {
   data() {
     // NB:: If you need to update state you can't do it directly thus
     // you have to clone the state e.g. user into local state
-    return { activeUser: { ...this.user } };
+    return { activeUser: { ...this.user }, uploadingImage: false };
   },
   methods: {
-    save() {
+    ...mapActions('auth', ['uploadAvatar']),
+    async handleAvatarChange(event) {
+      this.uploadingImage = true;
+      const [file] = event.target.files;
+      const uploadedImage = await this.uploadAvatar({ file });
+      this.activeUser.avatar = uploadedImage || this.activeUser.avatar;
+      this.uploadingImage = false;
+    },
+    async handleRandomAvatarUpload() {
+      // Pixabay refrains you from Hotlinking their URLs into your app parmanently
+      const genaratedAvatar = this.activeUser.avatar.startsWith('https://pixabay.com');
+      if (genaratedAvatar) {
+        // Tip:: use fetch to turn the image into a blob
+        const image = await fetch(this.activeUser.avatar);
+        const blob = await image.blob();
+        this.activeUser.avatar = await this.uploadAvatar({ file: blob, filename: 'random' });
+      }
+    },
+    async save() {
+      await this.handleRandomAvatarUpload();
       // We still need to clone the user inside state not update it directly
       this.$store.dispatch('users/updateUser', { ...this.activeUser });
       // Redirect the user on save

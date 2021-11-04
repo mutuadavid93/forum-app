@@ -25,8 +25,20 @@
         </div>
 
         <div class="form-group">
-          <label for="avatar">Avatar</label>
-          <input v-model="form.avatar" id="avatar" type="text" class="form-input" />
+          <label for="avatar"
+            >Avatar
+            <div v-if="avatarPreview">
+              <img class="avatar-xlarge" :src="avatarPreview" :alt="form?.name?.toUpperCase()" />
+            </div>
+          </label>
+          <input
+            v-show="!avatarPreview"
+            @change="handleImageUpload"
+            id="avatar"
+            type="file"
+            class="form-input"
+            accept="image/*"
+          />
         </div>
 
         <div class="form-actions">
@@ -46,6 +58,7 @@
 export default {
   data() {
     return {
+      avatarPreview: null,
       form: {
         name: '',
         username: '',
@@ -63,6 +76,17 @@ export default {
     async registerWithGoogle() {
       await this.$store.dispatch('auth/signInWithGoogle');
       this.$router.push('/');
+    },
+
+    handleImageUpload(event) {
+      // Don't upload to firestore
+      // eslint-disable-next-line prefer-destructuring
+      this.form.avatar = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        this.avatarPreview = evt.target.result;
+      };
+      reader.readAsDataURL(this.form.avatar);
     },
   },
 

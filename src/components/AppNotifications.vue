@@ -1,7 +1,12 @@
 <template>
   <div class="notifications">
     <transition-group name="notification">
-      <div class="notification" v-for="notification in notifications" :key="notification.id">
+      <div
+        :class="`notification-type-${notification.type}`"
+        class="notification"
+        v-for="notification in notifications"
+        :key="notification.id"
+      >
         <span>{{ notification.message }}</span>
         <button @click="removeNotification(notification.id)">x</button>
       </div>

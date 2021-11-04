@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import firebase from 'firebase';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import App from '@/App.vue';
 import store from '@/store';
@@ -11,7 +11,7 @@ import ClickOutSideDirective from '@/plugins/ClickOutsideDirective';
 import PageScrollDirective from '@/plugins/PageScrollDirective';
 import Vue3Pagination from '@/plugins/Vue3Pagination';
 
-library.add(faPencilAlt);
+library.add(faPencilAlt, faCamera);
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

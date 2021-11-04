@@ -1,5 +1,9 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable comma-dangle */
 import firebase from 'firebase';
+
+// Tip:: composables are also accessible on Vuex actions
+import useNotifications from '@/composables/useNotifications';
 
 export default {
   namespaced: true,
@@ -36,6 +40,28 @@ export default {
       });
     },
 
+    // eslint-disable-next-line consistent-return
+    async uploadAvatar({ state }, { authId, file, filename }) {
+      if (!file) return null;
+      authId = authId || state.authId;
+      filename = filename || file.name;
+
+      try {
+        const uploadPath = `uploads/${authId}/images/${Date.now()}-${filename}`;
+        const storageBucket = firebase
+          .storage()
+          .ref()
+          .child(uploadPath);
+        const snapshot = await storageBucket.put(file);
+        // get the image url and store it in firestore
+        const url = await snapshot.ref.getDownloadURL();
+        return url;
+      } catch (error) {
+        const { addNotification } = useNotifications();
+        addNotification({ message: 'Error uploading avatar!', type: 'error' });
+      }
+    },
+
     // prettier-ignore
     async registerUserWithEmailAndPassword(
       { dispatch },
@@ -44,6 +70,7 @@ export default {
       { avatar = null, email, name, username, password },
     ) {
       const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      avatar = await dispatch('uploadAvatar', { authId: result.user.uid, file: avatar });
       // eslint-disable-next-line object-curly-newline
       await dispatch('users/registerUser', { id: result.user.uid, email, name, username, avatar }, { root: true });
     },
@@ -74,7 +101,7 @@ export default {
             username: user.email,
             avatar: user.photoURL,
           },
-          { root: true }
+          { root: true },
         );
       }
     },
@@ -97,7 +124,7 @@ export default {
             commit('setAuthUserUnsubscribe', unsubscribe);
           },
         },
-        { root: true }
+        { root: true },
       );
       commit('setAuthId', userId);
     },

@@ -3001,3 +3001,16 @@ hr {
 .notification-move {
   transition: transform 0.8s ease;
 }
+.notification-type-error {
+  border-left: 5px solid rgb(146, 5, 5);
+}
+
+.avatar-edit {
+  position: relative;
+}
+.avatar-edit .avatar-upload-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
