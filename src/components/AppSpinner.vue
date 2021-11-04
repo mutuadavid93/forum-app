@@ -7,7 +7,15 @@
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    color: { type: String, default: '#263959' },
+  },
+  data() {
+    // Tip: You can update state using a prop
+    return { spinnerColor: this.color };
+  },
+};
 </script>
 
 <style scoped>
@@ -20,7 +28,8 @@ export default {};
 .spinner > div {
   width: 18px;
   height: 18px;
-  background-color: #263959;
+  /* Tip: You can bind attribute value on css section */
+  background-color: v-bind(spinnerColor);
 
   border-radius: 100%;
   display: inline-block;

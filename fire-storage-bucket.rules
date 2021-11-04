@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /uploads/{userId}/images/{imageName}{
+        allow read;
+
+        // Allow owner to write/update avatar and ensure resource it's an image
+        allow write: if request.auth.uid == userId && request.resource.contentType.matches('image/.*')
+    }
+  }
+}
