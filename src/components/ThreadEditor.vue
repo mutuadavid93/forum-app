@@ -1,21 +1,15 @@
 <template>
-  <form @submit.prevent="save">
-    <div class="form-group">
-      <label for="thread_title">Title:</label>
-      <input v-model="form.title" type="text" id="thread_title" class="form-input" name="title" />
-    </div>
-
-    <div class="form-group">
-      <label for="thread_content">Content:</label>
-      <textarea
-        v-model="form.text"
-        id="thread_content"
-        class="form-input"
-        name="content"
-        rows="8"
-        cols="140"
-      ></textarea>
-    </div>
+  <VeeForm @submit="save">
+    <app-form-field label="Title" name="title" v-model="form.title" rules="required" />
+    <app-form-field
+      as="textarea"
+      name="text"
+      label="Content"
+      v-model="form.text"
+      rules="required"
+      rows="8"
+      cols="140"
+    />
 
     <div class="btn-group">
       <button class="btn btn-ghost" @click.prevent="$emit('cancel')">Cancel</button>
@@ -23,7 +17,7 @@
         {{ existing ? 'Update' : 'Publish' }}
       </button>
     </div>
-  </form>
+  </VeeForm>
 </template>
 
 <script>
