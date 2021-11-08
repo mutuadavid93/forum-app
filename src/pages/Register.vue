@@ -1,28 +1,70 @@
 <template>
   <div class="flex-grid justify-center">
     <div class="col-2">
-      <form @submit.prevent="register" class="card card-form">
+      <!-- veeform assumes prevent modifier by default -->
+      <VeeForm @submit="register" class="card card-form">
         <h1 class="text-center">Register</h1>
 
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input v-model="form.name" id="name" type="text" class="form-input" />
-        </div>
+        <app-form-field v-model="form.name" name="name" label="Name" rules="required" />
+        <app-form-field v-model="form.username" name="username" label="Username" rules="required" />
+        <app-form-field
+          v-model="form.email"
+          name="email"
+          type="email"
+          label="Email address"
+          rules="required|email"
+        />
+        <app-form-field
+          v-model="form.password"
+          name="password"
+          type="password"
+          label="Password"
+          rules="required|min:8"
+        />
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="username">Username</label>
-          <input v-model="form.username" id="username" type="text" class="form-input" />
-        </div>
+          <VeeField
+            name="username"
+            v-model="form.username"
+            id="username"
+            type="text"
+            class="form-input"
+            rules="required|unique:users,username"
+          />
+          <VeeErrorMessage name="username" class="form-error" />
+        </div> -->
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="form.email" id="email" type="email" class="form-input" />
-        </div>
+          <VeeField
+            :rules="{
+              required: true,
+              email: true,
+              unique: { collection: 'users', field: 'email' },
+            }"
+            name="email"
+            v-model="form.email"
+            id="email"
+            type="email"
+            class="form-input"
+          />
+          <VeeErrorMessage name="email" class="form-error" />
+        </div> -->
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="password">Password</label>
-          <input v-model="form.password" id="password" type="password" class="form-input" />
-        </div>
+          <VeeField
+            name="password"
+            v-model="form.password"
+            id="password"
+            type="password"
+            class="form-input"
+            label="Password"
+            rules="required|min:8"
+          />
+          <VeeErrorMessage name="password" class="form-error" />
+        </div> -->
 
         <div class="form-group">
           <label for="avatar"
@@ -31,7 +73,8 @@
               <img class="avatar-xlarge" :src="avatarPreview" :alt="form?.name?.toUpperCase()" />
             </div>
           </label>
-          <input
+          <VeeField
+            name="avatar"
             v-show="!avatarPreview"
             @change="handleImageUpload"
             id="avatar"
@@ -44,7 +87,7 @@
         <div class="form-actions">
           <button type="submit" class="btn-blue btn-block">Register</button>
         </div>
-      </form>
+      </VeeForm>
       <div class="text-center push-top">
         <button @click="registerWithGoogle" class="btn-red btn-xsmall">
           <i class="fa fa-google fa-btn"></i>Sign up with Google

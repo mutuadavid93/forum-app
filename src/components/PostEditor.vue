@@ -1,14 +1,21 @@
 <template>
-    <!-- Discussion Textarea -->
+  <!-- Discussion Textarea -->
   <div class="col-large">
-    <form @submit.prevent="save">
-      <div class="form-group">
-        <textarea v-model="postCopy.text" name="" id="" cols="30" rows="10" class="form-input" />
-      </div>
+    <!-- Force veeform to rerender incase state resets by using a key -->
+    <VeeForm @submit="save" :key="formKey">
+      <app-form-field
+        as="textarea"
+        name="text"
+        rows="10"
+        cols="30"
+        rules="required"
+        v-model="postCopy.text"
+      />
+
       <div class="form-actions">
-        <button class="btn-blue">{{buttonLabel}}</button>
+        <button class="btn-blue">{{ buttonLabel }}</button>
       </div>
-    </form>
+    </VeeForm>
   </div>
 </template>
 
@@ -18,7 +25,7 @@ export default {
     post: { type: Object, default: () => ({ text: null }) },
   },
   data() {
-    return { postCopy: { ...this.post } };
+    return { postCopy: { ...this.post }, formKey: Math.random() };
   },
   computed: {
     buttonLabel() {
@@ -30,11 +37,12 @@ export default {
     save() {
       this.$emit('save', { post: this.postCopy }); // access under eventData.post
       this.postCopy.text = '';
+
+      // Trigger the form re-render by resetting the key
+      this.formKey = Math.random();
     },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
