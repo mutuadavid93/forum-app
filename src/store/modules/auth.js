@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 /* eslint-disable comma-dangle */
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 
 // Tip:: composables are also accessible on Vuex actions
 import useNotifications from '@/composables/useNotifications';
@@ -18,6 +19,16 @@ export default {
     authUser: (state, getters, rootState, rootGetters) => rootGetters['users/user'](state.authId),
   },
   actions: {
+    // Make sure email is updated on the auth service as well
+    async updateEmail({ state }, { email }) {
+      return firebase.auth().currentUser.updateEmail(email);
+    },
+
+    async reauthenticate({ state }, { email, password }) {
+      const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+      await firebase.auth().currentUser.reauthenticateWithCredential(credential);
+    },
+
     initAuthentication({ dispatch, commit, state }) {
       // Unsubscribe from existing observers
       if (state.authObserverUnsubscribe) state.authObserverUnsubscribe();
@@ -48,10 +59,7 @@ export default {
 
       try {
         const uploadPath = `uploads/${authId}/images/${Date.now()}-${filename}`;
-        const storageBucket = firebase
-          .storage()
-          .ref()
-          .child(uploadPath);
+        const storageBucket = firebase.storage().ref().child(uploadPath);
         const snapshot = await storageBucket.put(file);
         // get the image url and store it in firestore
         const url = await snapshot.ref.getDownloadURL();
@@ -85,10 +93,7 @@ export default {
       const provider = new firebase.auth.GoogleAuthProvider();
       const response = await firebase.auth().signInWithPopup(provider);
       const { user } = response;
-      const userRef = firebase
-        .firestore()
-        .collection('users')
-        .doc(user.uid);
+      const userRef = firebase.firestore().collection('users').doc(user.uid);
       const userDoc = await userRef.get();
 
       if (!userDoc.exists) {
@@ -143,11 +148,7 @@ export default {
       // For the first page startAfter is null
       if (startAfter) {
         // Get the actual document from firestore
-        const doc = await firebase
-          .firestore()
-          .collection('posts')
-          .doc(startAfter.id)
-          .get();
+        const doc = await firebase.firestore().collection('posts').doc(startAfter.id).get();
         query = query.startAfter(doc);
       }
       const posts = await query.get(); // get() executes the query

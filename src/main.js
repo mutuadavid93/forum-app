@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
-import firebase from 'firebase';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPencilAlt, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import firebase from '@/helpers/firebase';
 import App from '@/App.vue';
 import store from '@/store';
 import router from '@/router';

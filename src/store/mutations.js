@@ -13,4 +13,10 @@ export default {
     // Once on onSnapshot events are called and done, clean-up
     state.unsubscribes = [];
   },
+
+  clearItems(state, { modules = [] }) {
+    modules.forEach((module) => {
+      state[module].items = [];
+    });
+  },
 };

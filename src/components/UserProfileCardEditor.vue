@@ -1,6 +1,6 @@
 <template>
   <div class="profile-card">
-    <form @submit.prevent="save">
+    <VeeForm @submit="save">
       <p class="text-center avatar-edit">
         <label for="avatar">
           <app-avatar-img
@@ -78,16 +78,23 @@
         <button class="btn-ghost" @click.prevent="cancel">Cancel</button>
         <button type="submit" class="btn-blue">Save</button>
       </div>
-    </form>
+    </VeeForm>
+    <user-profile-card-editor-reauthenticate
+      v-model="needsReAuth"
+      @success="onReaAuthenticated"
+      @fail="onReaAuthenticatedFailed"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
 import UserProfileCardEditorRandomAvatar from '@/components/UserProfileCardEditorRandomAvatar.vue';
+import UserProfileCardEditorReauthenticate from '@/components/UserProfileCardEditorReauthenticate.vue';
+import useNotifications from '@/composables/useNotifications';
 
 export default {
-  components: { UserProfileCardEditorRandomAvatar },
+  components: { UserProfileCardEditorRandomAvatar, UserProfileCardEditorReauthenticate },
   name: 'UserProfileCardEditor',
   props: {
     user: {
@@ -95,10 +102,19 @@ export default {
       required: true,
     },
   },
+  setup() {
+    const { addNotification } = useNotifications();
+    return { addNotification };
+  },
   data() {
     // NB:: If you need to update state you can't do it directly thus
     // you have to clone the state e.g. user into local state
-    return { activeUser: { ...this.user }, uploadingImage: false, locationOptions: [] };
+    return {
+      activeUser: { ...this.user },
+      uploadingImage: false,
+      locationOptions: [],
+      needsReAuth: false,
+    };
   },
   methods: {
     ...mapActions('auth', ['uploadAvatar']),
@@ -126,12 +142,34 @@ export default {
         this.activeUser.avatar = await this.uploadAvatar({ file: blob, filename: 'random' });
       }
     },
-    async save() {
-      await this.handleRandomAvatarUpload();
+    async onReaAuthenticatedFailed() {
+      this.addNotification({ message: 'Error updating user', type: 'error', timeout: 3000 });
+      this.$router.push({ name: 'Profile' });
+    },
+    async onReaAuthenticated() {
+      await this.$store.dispatch('auth/updateEmail', { email: this.activeUser.email });
+      this.saveUserData();
+    },
+    async saveUserData() {
       // We still need to clone the user inside state not update it directly
-      this.$store.dispatch('users/updateUser', { ...this.activeUser });
+      await this.$store.dispatch('users/updateUser', {
+        ...this.activeUser,
+        // Overwrite thread ids on the user payload b4 passing the user into the action
+        threads: this.activeUser.threadIds,
+      });
       // Redirect the user on save
       this.$router.push({ name: 'Profile' });
+      this.addNotification({ message: 'User updated successfully', timeout: 3000 });
+    },
+    async save() {
+      await this.handleRandomAvatarUpload();
+
+      const emailChanged = this.activeUser.email !== this.user.email;
+      if (emailChanged) {
+        this.needsReAuth = true;
+      } else {
+        await this.saveUserData();
+      }
     },
     cancel() {
       this.$router.push({ name: 'Profile' });

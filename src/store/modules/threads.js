@@ -1,6 +1,6 @@
 /* eslint-disable comma-dangle */
-import firebase from 'firebase';
 import chunk from 'lodash/chunk';
+import firebase from '@/helpers/firebase';
 import {
   findById,
   docToResource,
@@ -28,6 +28,7 @@ export default {
           return thread.posts.length - 1;
         },
         get contributorsCount() {
+          if (!thread.contributors) return 0;
           return thread.contributors?.length || 0;
         },
       };
@@ -74,7 +75,7 @@ export default {
           resource: 'threads',
           item: { ...newThread.data(), id: newThread.id },
         },
-        { root: true }
+        { root: true },
       );
       commit(
         'users/appendThreadToUser',
@@ -82,7 +83,7 @@ export default {
           parentId: userId,
           childId: threadRef.id,
         },
-        { root: true }
+        { root: true },
       );
       commit(
         'forums/appendThreadToForum',
@@ -90,15 +91,16 @@ export default {
           parentId: forumId,
           childId: threadRef.id,
         },
-        { root: true }
+        { root: true },
       );
       await dispatch(
         'posts/createPost',
         {
           text,
           threadId: threadRef.id,
+          firstInThread: true,
         },
-        { root: true }
+        { root: true },
       );
 
       return findById(state.items, threadRef.id);

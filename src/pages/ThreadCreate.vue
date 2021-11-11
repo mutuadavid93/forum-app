@@ -61,6 +61,7 @@ export default {
   beforeRouteLeave() {
     if (this.formIsDirty) {
       // prettier-ignore
+      // eslint-disable-next-line no-alert
       const confirmed = window.confirm(
         'Are you sure you want to leave? Unsaved changes will be lost',
       );
