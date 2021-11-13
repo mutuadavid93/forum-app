@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPencilAlt, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { createHead } from '@vueuse/head';
 import firebase from '@/helpers/firebase';
 import App from '@/App.vue';
 import store from '@/store';
@@ -20,6 +21,7 @@ firebase.initializeApp(firebaseConfig);
 const forumApp = createApp(App);
 forumApp.use(router);
 forumApp.use(store);
+forumApp.use(createHead());
 
 // Register plugins
 forumApp.use(PageScrollDirective);

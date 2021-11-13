@@ -1,6 +1,11 @@
 <template>
   <div v-if="asyncDataStatus_ready" class="container col-full">
     <div class="col-full push-top" v-if="forum">
+      <AppHead>
+        <title>{{ forum?.name }}</title>
+        <meta property="og:title" :content="forum?.name" />
+        <meta name="twitter:title" :content="forum?.name" />
+      </AppHead>
       <div class="forum-header">
         <div class="forum-details">
           <h1>{{ forum.name }}</h1>
@@ -18,11 +23,7 @@
       <thread-list :threads="threads" />
 
       <!-- Place pagination below threads' list -->
-      <v-pagination
-        v-model="page"
-        :pages="totalPages"
-        active-color="#4E9C7F"
-      />
+      <v-pagination v-model="page" :pages="totalPages" active-color="#4E9C7F" />
     </div>
   </div>
 </template>
