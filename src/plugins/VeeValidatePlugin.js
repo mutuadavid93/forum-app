@@ -1,9 +1,9 @@
-import firebase from 'firebase';
 // eslint-disable-next-line object-curly-newline
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate';
 // eslint-disable-next-line object-curly-newline
 import { required, email, min, url } from '@vee-validate/rules';
 import { localize } from '@vee-validate/i18n';
+import firebase from '@/helpers/firebase';
 
 export default (app) => {
   // defineRule defines global rules to be used in any form

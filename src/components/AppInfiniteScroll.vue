@@ -13,7 +13,7 @@ export default {
   },
   mounted() {
     this.observer = new IntersectionObserver(
-      (entries, observer) => {
+      (entries) => {
         entries.forEach((entry) => {
           // Whenever the div in the template is within the visible page
           // the component emits a load event

@@ -1,5 +1,5 @@
 /* eslint-disable object-curly-newline */
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 import {
   docToResource,
   makeAppendChildToParentMutation,
@@ -33,6 +33,9 @@ export default {
         get threads() {
           return rootState.threads.items.filter((thread) => thread.userId === currentUser.id);
         },
+        get threadIds() {
+          return currentUser.threads;
+        },
         get threadsCount() {
           // For users without threads default to 0
           return currentUser.threads?.length ?? 0;
@@ -46,10 +49,7 @@ export default {
       const usernameLower = username.toLowerCase();
       const emailLower = email.toLowerCase();
       const payload = { avatar, email: emailLower, name, username, usernameLower, registeredAt };
-      const userRef = await firebase
-        .firestore()
-        .collection('users')
-        .doc();
+      const userRef = await firebase.firestore().collection('users').doc();
       userRef.set(payload);
       const newUser = await userRef.get();
       commit('setItem', { resource: 'users', item: newUser }, { root: true });
@@ -66,10 +66,7 @@ export default {
         email: user.email || null,
         location: user.location || null,
       };
-      const userRef = firebase
-        .firestore()
-        .collection('users')
-        .doc(user.id);
+      const userRef = firebase.firestore().collection('users').doc(user.id);
       // When updating a single record, don't use batch, update it directly
       await userRef.update(updates);
       commit('setItem', { resource: 'users', item: user }, { root: true });
@@ -80,10 +77,7 @@ export default {
       const usernameLower = username.toLowerCase();
       const mail = email.toLowerCase();
       const payload = { name, username, email: mail, avatar, registeredAt, usernameLower };
-      const userRef = await firebase
-        .firestore()
-        .collection('users')
-        .doc(id);
+      const userRef = await firebase.firestore().collection('users').doc(id);
       userRef.set(payload);
       const newUser = await userRef.get();
       commit('setItem', { resource: 'users', item: newUser });

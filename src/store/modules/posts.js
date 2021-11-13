@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable comma-dangle */
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 import { makeFetchItemAction, makeFetchItemsAction } from '@/helpers';
 
 export default {
@@ -14,6 +15,7 @@ export default {
         publishedAt: firebase.firestore.FieldValue.serverTimestamp(),
         // Access root state under auth module
         userId: rootState.auth.authId,
+        firstInThread: post.firstInThread || false,
       });
 
       const db = firebase.firestore();
@@ -27,11 +29,18 @@ export default {
 
       // Add post into firestore before pushing to vuex store
       batch.set(postRef, post);
-      batch.update(threadRef, {
+      const threadUpdates = {
         // Append the new id to the existing array of posts' ids in firebase
         posts: firebase.firestore.FieldValue.arrayUnion(postRef.id),
-        contributors: firebase.firestore.FieldValue.arrayUnion(rootState.auth.authId),
-      });
+      };
+
+      if (!post.firstInThread) {
+        threadUpdates.contributors = firebase.firestore.FieldValue.arrayUnion(
+          rootState.auth.authId,
+        );
+      }
+
+      batch.update(threadRef, threadUpdates);
       batch.update(userRef, {
         // increment postcount whenever authenticated user adds a post
         postsCount: firebase.firestore.FieldValue.increment(1),
@@ -45,7 +54,7 @@ export default {
           resource: 'posts',
           item: { ...newPost.data(), id: newPost.id },
         },
-        { root: true }
+        { root: true },
       );
       commit(
         'threads/appendPostToThread',
@@ -53,16 +62,20 @@ export default {
           childId: newPost.id,
           parentId: post.threadId,
         },
-        { root: true }
+        { root: true },
       );
-      commit(
-        'threads/appendContributorToThread',
-        {
-          childId: rootState.auth.authId,
-          parentId: post.threadId,
-        },
-        { root: true }
-      );
+
+      // If post not the first in thread append contributor to it
+      if (!post.firstInThread) {
+        commit(
+          'threads/appendContributorToThread',
+          {
+            childId: rootState.auth.authId,
+            parentId: post.threadId,
+          },
+          { root: true },
+        );
+      }
     },
 
     async updatePost({ commit, state, rootState }, { text, id }) {
@@ -74,10 +87,7 @@ export default {
           moderated: false,
         },
       };
-      const postRef = firebase
-        .firestore()
-        .collection('posts')
-        .doc(id);
+      const postRef = firebase.firestore().collection('posts').doc(id);
       await postRef.update(post);
       const updatedPost = await postRef.get();
       commit('setItem', { resource: 'posts', item: updatedPost }, { root: true });

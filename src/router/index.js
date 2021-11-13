@@ -1,38 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '@/pages/Home.vue';
-import ThreadShow from '@/pages/ThreadShow.vue';
-import ThreadCreate from '@/pages/ThreadCreate.vue';
-import ThreadEdit from '@/pages/ThreadEdit.vue';
-import NotFound from '@/pages/NotFound.vue';
-import Forum from '@/pages/Forum.vue';
-import Category from '../pages/Category.vue';
-import Profile from '@/pages/Profile.vue';
-import Register from '@/pages/Register.vue';
-import SignIn from '@/pages/Signin.vue';
 import store from '@/store';
 import { findById } from '@/helpers';
 
 // Define your routes
 const routes = [
-  { path: '/', name: 'Home', component: Home },
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import(/* webpackChunkName: "Home" */ '@/pages/Home.vue'),
+  },
   {
     path: '/forum/:forumId/thread/create',
     name: 'ThreadCreate',
-    component: ThreadCreate,
+    component: () => import(/* webpackChunkName: "ThreadCreate" */ '@/pages/ThreadCreate.vue'),
     props: true,
     meta: { requiresAuth: true },
   },
   {
     path: '/thread/:id/edit',
     name: 'ThreadEdit',
-    component: ThreadEdit,
+    component: () => import(/* webpackChunkName: "ThreadEdit" */ '@/pages/ThreadEdit.vue'),
     props: true,
     meta: { requiresAuth: true },
   },
   {
     path: '/forum/:id',
     name: 'Forum',
-    component: Forum,
+    component: () => import(/* webpackChunkName: "Forum" */ '@/pages/Forum.vue'),
     props: true,
   },
 
@@ -40,7 +34,7 @@ const routes = [
   {
     path: '/me',
     name: 'Profile',
-    component: Profile,
+    component: () => import(/* webpackChunkName: "Profile" */ '@/pages/Profile.vue'),
 
     // Route's meta fields help add custom attributes to a route
     meta: { toTop: true, smoothScroll: true, requiresAuth: true },
@@ -48,7 +42,7 @@ const routes = [
   {
     path: '/me/edit',
     name: 'ProfileEdit',
-    component: Profile,
+    component: () => import(/* webpackChunkName: "Profile" */ '@/pages/Profile.vue'),
     // Update your props here too e.g. a negation
     props: { edit: true },
     meta: { requiresAuth: true },
@@ -56,13 +50,13 @@ const routes = [
   {
     path: '/category/:id',
     name: 'Category',
-    component: Category,
+    component: () => import(/* webpackChunkName: "Category" */ '@/pages/Category.vue'),
     props: true,
   },
   {
     path: '/thread/:id',
     name: 'ThreadShow',
-    component: ThreadShow,
+    component: () => import(/* webpackChunkName: "ThreadShow" */ '@/pages/ThreadShow.vue'),
     // Allow props in named routes
     props: true,
 
@@ -89,7 +83,7 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register,
+    component: () => import(/* webpackChunkName: "Register" */ '@/pages/Register.vue'),
 
     // A logged in user doesn't need to see certain pages
     meta: { requiresGuest: true },
@@ -97,7 +91,7 @@ const routes = [
   {
     path: '/signin',
     name: 'SignIn',
-    component: SignIn,
+    component: () => import(/* webpackChunkName: "SignIn" */ '@/pages/Signin.vue'),
     meta: { requiresGuest: true },
   },
 
@@ -113,7 +107,11 @@ const routes = [
   },
 
   // will match everything and put it under `$route.params.pathMatch`
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import(/* webpackChunkName: "NotFound" */ '@/pages/NotFound.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -131,9 +129,15 @@ const router = createRouter({
   },
 });
 
+// Clear items from state after navigating from a page/route to the next
+router.afterEach(() => {
+  // Tip:: No need to clear users thus we won't lose the authenticated user
+  store.dispatch('clearItems', { modules: ['categories', 'forums', 'posts', 'threads'] });
+});
+
 // Below is a global navigation guard, runs before each route in the application
 // eslint-disable-next-line consistent-return
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
   await store.dispatch('auth/initAuthentication');
   // Unsubscribe from onSnapshot events
   store.dispatch('unsubscribeAllSnapshots');

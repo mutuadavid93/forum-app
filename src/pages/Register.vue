@@ -22,50 +22,6 @@
           rules="required|min:8"
         />
 
-        <!-- <div class="form-group">
-          <label for="username">Username</label>
-          <VeeField
-            name="username"
-            v-model="form.username"
-            id="username"
-            type="text"
-            class="form-input"
-            rules="required|unique:users,username"
-          />
-          <VeeErrorMessage name="username" class="form-error" />
-        </div> -->
-
-        <!-- <div class="form-group">
-          <label for="email">Email</label>
-          <VeeField
-            :rules="{
-              required: true,
-              email: true,
-              unique: { collection: 'users', field: 'email' },
-            }"
-            name="email"
-            v-model="form.email"
-            id="email"
-            type="email"
-            class="form-input"
-          />
-          <VeeErrorMessage name="email" class="form-error" />
-        </div> -->
-
-        <!-- <div class="form-group">
-          <label for="password">Password</label>
-          <VeeField
-            name="password"
-            v-model="form.password"
-            id="password"
-            type="password"
-            class="form-input"
-            label="Password"
-            rules="required|min:8"
-          />
-          <VeeErrorMessage name="password" class="form-error" />
-        </div> -->
-
         <div class="form-group">
           <label for="avatar"
             >Avatar

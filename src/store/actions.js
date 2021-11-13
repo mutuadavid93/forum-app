@@ -1,5 +1,5 @@
 /* eslint-disable object-curly-newline */
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 import { findById } from '@/helpers';
 
 export default {
@@ -55,6 +55,9 @@ export default {
   },
 
   fetchItems({ dispatch }, { ids, emoji, resource, onSnapshot = null }) {
+    // If no ids provided, default to empty array
+    // eslint-disable-next-line no-param-reassign
+    ids = ids || [];
     const resourceIds = ids.map((id) => dispatch('fetchItem', { id, emoji, resource, onSnapshot }));
     return Promise.all(resourceIds);
   },
@@ -62,5 +65,9 @@ export default {
   async unsubscribeAllSnapshots({ state, commit }) {
     state.unsubscribes.forEach((unsubscribe) => unsubscribe());
     commit('clearAllUnscribes');
+  },
+
+  clearItems({ commit }, { modules = [] }) {
+    commit('clearItems', { modules });
   },
 };
