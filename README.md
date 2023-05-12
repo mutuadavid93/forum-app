@@ -1,24 +1,17 @@
-# vue-masterclass
+# Forum App
 
-## Project setup
-```
-yarn install
-```
+see - [Forum Application](https://618f78100408c90007f29efc--unruffled-wiles-0be791.netlify.app)
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+A Forum Application which has below features
 
-### Compiles and minifies for production
-```
-yarn build
-```
+- Authentication
+- Authorization
+- Forums
+- Threads
+- Posts
 
-### Lints and fixes files
-```
-yarn lint
-```
+Stack
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- Vue 3
+- Firebase
+- VueX
